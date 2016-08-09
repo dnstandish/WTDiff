@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- double capture-time -->
+<file-tree-snapshot>
+<capture-time>2015-04-15T16:27:29.483+0000</capture-time>
+<capture-time>2015-04-15T16:27:29.483+0000</capture-time>
+<snapshot>
+<dir name="adir"/>
+</snapshot>
+</file-tree-snapshot>

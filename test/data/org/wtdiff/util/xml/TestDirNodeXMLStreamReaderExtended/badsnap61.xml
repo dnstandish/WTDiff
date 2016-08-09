@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- dirs should not have direct child file element -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123">
+<dirs>
+<file/>
+</dirs>
+</dir>
+</snapshot>
+</file-tree-snapshot>

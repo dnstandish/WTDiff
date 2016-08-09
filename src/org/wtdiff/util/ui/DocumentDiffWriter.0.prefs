@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE preferences SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<preferences EXTERNAL_XML_VERSION="1.0">
+  <root type="user">
+    <map/>
+    <node name="org">
+      <map/>
+      <node name="wtdiff">
+        <map/>
+        <node name="util">
+          <map/>
+          <node name="ui">
+            <map/>
+            <node name="DocumentDiffWriter">
+              <map/>
+              <node name="0">
+                <map/>
+                <node name="info">
+                  <map/>
+                  <node name="indicator">
+                    <map>
+<!--                  <entry key="Monospaced" value="false"/>
+                      <entry key="bgcolor" value="16777215"/>
+                      <entry key="bold" value="true"/>
+                      <entry key="fgcolor" value="460551"/>
+                      <entry key="italic" value="false"/> -->
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="13421772"/>
+                    </map>
+                  </node>
+                  <node name="lineno">
+                    <map>
+                      <entry key="bgcolor" value="15066597"/>
+                    </map>
+                  </node>
+                  <node name="text">
+                    <map>
+                      <entry key="bold" value="true"/>
+                    </map>
+                  </node>
+                </node>
+                <node name="common">
+                  <map/>
+                  <node name="indicator">
+                    <map>
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="13421772"/>
+                    </map>
+                  </node>
+                  <node name="lineno">
+                    <map>
+                      <entry key="bgcolor" value="15066597"/>
+                    </map>
+                  </node>
+                  <node name="text">
+                    <map>
+<!--                      <entry key="bgcolor" value="16711680"/>  debug --> 
+                    </map>
+                  </node>
+                </node>
+                <node name="oldonly">
+                  <map/>
+                  <node name="indicator">
+                    <map>
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="13421772"/>
+                    </map>
+                  </node>
+                  <node name="lineno">
+                    <map>
+                      <entry key="bgcolor" value="15066597"/>
+                    </map>
+                  </node>
+                  <node name="text">
+                    <map>
+                      <entry key="bgcolor" value="16764108"/>
+                    </map>
+                  </node>
+                </node>
+                <node name="newonly">
+                  <map/>
+                  <node name="indicator">
+                    <map>
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="13421772"/>
+                    </map>
+                  </node>
+                  <node name="lineno">
+                    <map>
+                      <entry key="bgcolor" value="15066597"/>
+                    </map>
+                  </node>
+                  <node name="text">
+                    <map>
+                      <entry key="bgcolor" value="13434828"/> 
+                    </map>
+                  </node>
+                </node>
+                <node name="changed">
+                  <map/>
+                  <node name="indicator">
+                    <map>
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="13421772"/>
+                    </map>
+                  </node>
+                  <node name="lineno">
+                    <map>
+                      <entry key="bgcolor" value="15066597"/>
+                    </map>
+                  </node>
+                  <node name="text">
+                    <map>
+                      <entry key="bgcolor" value="16777096"/>
+                    </map>
+                  </node>
+                </node>
+                <node name="warning">
+                  <map/>
+                  <node name="indicator">
+                    <map>
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="13421772"/>
+                    </map>
+                  </node>
+                  <node name="lineno">
+                    <map>
+                      <entry key="bgcolor" value="15066597"/>
+                    </map>
+                  </node>
+                  <node name="text">
+                    <map>
+                      <entry key="bold" value="true"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </root>
+</preferences>

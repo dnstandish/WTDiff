@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- bad url encoding in name -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123">
+<files>
+<file name="n%Z" size="2" time="2015-04-15T07:35:30.400+0000" istext="yes" type="regfile"/>
+</files>
+<dirs/>
+</dir>
+</snapshot>
+</file-tree-snapshot>

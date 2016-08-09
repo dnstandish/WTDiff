@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- file tree snapshot unknown element bad -->
+<file-tree-snapshot>
+<bad>
+<dir name="adir"/>
+</bad>
+</file-tree-snapshot>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- capture-root  should not have child element -->
+<file-tree-snapshot>
+<capture-root><user>fred</user></capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="top"/>
+</snapshot>
+</file-tree-snapshot>

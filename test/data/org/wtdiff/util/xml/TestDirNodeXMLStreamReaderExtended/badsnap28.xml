@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- ffile missing time attribute -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123">
+<files>
+<!-- file attributes "name", "size", "time", "istext", "type" -->
+<file name="nm" size="0" istext="yes" type="regfile"/>
+</files>
+</dir>
+</snapshot>
+</file-tree-snapshot>

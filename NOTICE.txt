@@ -1,0 +1,16 @@
+WTDiff 
+Copyright 2015 David Standish
+
+diffutils
+Copyright 2010 Dmitry Naumenko (dm.naumenko@gmail.com)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+
+Apache Log4j
+Copyright 1999-2014 Apache Software Foundation
+
+Apache Commons CLI
+Copyright 2001-2009 The Apache Software Foundation
+
+Abbot 
+Copyright © 2002-2011 Timothy Wall

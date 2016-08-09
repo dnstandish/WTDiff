@@ -1,0 +1,11 @@
+
+WTDiff 0.0.1 Release Notes
+
+WTDiff required Java 7 or later.
+
+This is the initial release of WTDiff.  Directory/Zip file/Snapshot comparison fully implemented.
+
+Text file diff implemented for normal diff, full diff, and side by side diff implemented.
+
+Snapshotting currently supports only CRC32 and MD5 checksums.  
+

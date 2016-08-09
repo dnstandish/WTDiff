@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- snapshot should not have attribute -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot this="that">
+<dir name="adir"/>
+</snapshot>
+</file-tree-snapshot>

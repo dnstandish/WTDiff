@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- file tree snapshot should not contain text -->
+<file-tree-snapshot>badtext
+<snapshot>
+<dir name="adir"/>
+</snapshot>
+</file-tree-snapshot>

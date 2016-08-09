@@ -1,0 +1,32 @@
+<!ELEMENT file-tree-snapshot (
+   capture-time?, capture-root?, user?, home?, current-dir?, os?, host?, user-comment?,
+   digests-available,
+   snapshot) >
+<!ELEMENT capture-time (#PCDATA)>
+<!ELEMENT capture-root (#PCDATA)> <!-- URL encoded value -->
+<!ELEMENT user (#PCDATA)> <!-- URL encoded value -->
+<!ELEMENT home (#PCDATA)> <!-- URL encoded value -->
+<!ELEMENT current-dir (#PCDATA)> <!-- URL encoded value -->
+<!ELEMENT os (#PCDATA)> <!-- URL encoded value -->
+<!ELEMENT host (#PCDATA)> <!-- URL encoded value -->
+<!ELEMENT user-comment (#PCDATA)><!-- URL encoded value -->
+<!ELEMENT digests-available (digest-name*)>
+<!ELEMENT digest-name EMPTY>
+<!ELEMENT snapshot (dir)>
+<!ELEMENT dir (files?, dirs?)> 
+<!ELEMENT files (file*)>
+<!ELEMENT file (digest*,linkto?)>
+<!ELEMENT digest (#PCDATA)>
+<!ELEMENT linkto EMPTY>
+<!ELEMENT dirs (dir*)>
+
+<!ATTLIST digest-name name CDATA #REQUIRED>
+<!ATTLIST dir name CDATA #REQUIRED>
+<!ATTLIST file  name CDATA #REQUIRED>
+<!ATTLIST file size CDATA #REQUIRED>
+<!ATTLIST file time  CDATA #REQUIRED>
+<!ATTLIST file istext (yes|no) #REQUIRED>
+<!ATTLIST file type (regfile|symlink|special) #REQUIRED>
+<!ATTLIST digest name CDATA #REQUIRED>
+<!ATTLIST linkto target CDATA #REQUIRED>
+

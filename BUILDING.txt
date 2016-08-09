@@ -1,0 +1,42 @@
+Building WTDiff
+
+To build WTDiff you need JDK 7 or later. and Ant (1.9.3 works).
+
+
+To build 
+
+    ant clean
+    ant deploy
+
+Source and binaries will be created in dist/
+
+Testing requires JUnit 4 (4.11 works).  GUI testing requires Abbot 1.2.
+Test coverage requires Covertura (2.1.1).
+
+    
+    ant test-base
+     - runs non GUI tests
+    ant test-gui
+     - runs GUI tests
+    ant test
+     - runs both base and gui tests
+
+    ant coverage-base
+     - runs base tests and generates coverage reports
+     
+    ant coverage-gui
+     - runs GUI tests and generates coverage reports
+     
+    ant coverage
+     - run base and GUI tests and generates coverate reports
+
+
+For testing create a properties file build.{username}.propertes specifying
+the loactions of jar files for JUnit, Abbot and Cobertura. For example: 
+
+home.dir=/home/myhome
+3rdparty.dir=${home.dir}/prog/java/3rdparty
+cobertura.dir=${3rdparty.dir}/cobertura-2.1.1
+abbot.dir=${3rdparty.dir}/abbot-1.2.0
+junit.dir=/usr/share/java/
+

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!-- files should not have dirs subelement -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123">
+<files>
+<!-- file attributes "name", "size", "time", "istext", "type" -->
+<file name="n" size="2" time="2015-04-15T07:35:30.400+0000" istext="yes" type="symlink">
+<linkto target="xx"/>
+<dirs/>
+</file>
+</files>
+</dir>
+</snapshot>
+</file-tree-snapshot>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- snapshot immediate child should be dir, not dirs -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dirs>
+<dir name="adir"/>
+</dirs>
+</snapshot>
+</file-tree-snapshot>

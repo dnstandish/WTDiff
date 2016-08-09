@@ -1,0 +1,376 @@
+<?xml version="1.0"?>
+<!--
+ * Copyright 2009, David Standish
+ * All rights reserved
+ -->
+<project name="WTDiff" default="all" basedir=".">
+    <property name ="version" value="0.0.1"/> 
+    <property name ="final.name" value="${ant.project.name}-${version}"/> 
+    <property name="src.dir" value="src"/>
+    <property name="scripts.dir" value="${src.dir}/scripts"/>
+    <property name="test.src.dir" value="test"/>
+    <property name="test.data.dir" value="test/data"/>
+    <property name="test.out.dir" value="test-out"/>
+    <property name="test.reports.dir" value="${test.out.dir}/reports"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="lib.dir" value="lib"/>
+	<property name="build.dir" value="build"/>
+	<property name="build.classes" value="${build.dir}/classes"/>
+	<property name="build.instrumented.classes" value="${build.dir}/instrumented-classes"/>
+	<property name="build.test" value="${build.dir}/test"/>
+    <property name="build.test.classes" value="${build.dir}/test/classes"/>
+    <property name="build.test.data" value="${build.classes}/data"/>
+    <property name="build.lib" value="${build.dir}/lib"/>
+    <property name="build.scripts" value="${build.dir}/bin"/>
+    <property name="build.coverage.dir" value="${build.dir}/coverage"/>
+    <property name="stage.bin.dir" value="${build.dir}/stage-bin"/>
+    <property name="stage.src.dir" value="${build.dir}/stage-src"/>
+	
+<!--	<property name="3rdparty.dir" value="../3rdparty"/> -->
+	<property name="jar.name" value="${ant.project.name}.jar"/>
+	
+	<property name="debug.flag" value="on"/>
+
+	<property file="build-${user.name}.properties"/>
+	
+    <path id="classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <path id="junit.classpath">
+        <fileset dir="${junit.dir}">
+            <include name="junit4.jar"/>
+        </fileset>
+    </path>
+
+<!--	<property name="cobertura.dir" value="${3rdparty.dir}/cobertura-2.1.1" /> -->
+
+	<path id="cobertura.classpath">
+	    <fileset dir="${cobertura.dir}">
+            <exclude name="cobertura*-javadoc.jar" />
+            <exclude name="cobertura*-sources.jar" />
+            <include name="cobertura*.jar" />
+	        <include name="lib/**/*.jar" />
+	    </fileset>
+	</path>
+
+    <path id="abbot.classpath">
+        <fileset dir="${abbot.dir}">
+            <include name="lib/**/*.jar" />
+        </fileset>
+    </path>
+    
+	<taskdef classpathref="cobertura.classpath" resource="tasks.properties" />
+	
+	<target name="prepare">
+	    <echo>abbot.dir is "${abbot.dir}"</echo>
+		<mkdir dir="${build.dir}"/>
+        <mkdir dir="${build.classes}"/>
+        <mkdir dir="${build.scripts}"/>
+		<mkdir dir="${build.test}"/>
+        <mkdir dir="${build.test.classes}"/>
+        <mkdir dir="${build.test.data}"/>
+        <mkdir dir="${build.lib}"/>
+        <mkdir dir="${stage.bin.dir}"/>
+        <mkdir dir="${stage.src.dir}"/>
+        <mkdir dir="${test.out.dir}"/>
+        <mkdir dir="${test.reports.dir}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+		<delete dir="${dist.dir}"/>
+        <delete dir="${test.reports.dir}"/>
+        <delete dir="${test.out.dir}"/>
+	</target>
+	
+	<target name="compile" depends="prepare">
+		<delete dir="${build.instrumented.classes}"/>
+		<javac destdir="${build.classes}" debug="${debug.flag}" includeantruntime="false">
+			<src path="${src.dir}"/>
+			<classpath refid="classpath"/>
+		</javac>
+        <copy todir="${build.classes}">
+            <fileset dir="${src.dir}">
+                <include name="**/*.prefs" />
+                <include name="**/*.properties" />
+                <include name="**/*.dtd" /> 
+            </fileset>
+        </copy>     
+        <fixcrlf srcdir="${scripts.dir}" destdir="${build.scripts}" eol="lf" includes="**/*.sh"/>
+        <fixcrlf srcdir="${scripts.dir}" destdir="${build.scripts}" eol="crlf" includes="**/*.bat"/>
+	    <chmod dir="${build.scripts}" perm="a+x">
+            <include name="*.sh" /> 	        
+        </chmod>
+	</target>
+	
+    <target name="compile-test" depends="prepare,compile">
+<!--        <cobertura-instrument todir="${build.instrumented.classes}">
+            <fileset dir="build/classes">
+                <include name="**/*.class"/>
+                <include name="**/*.properites"/>
+            </fileset>
+        </cobertura-instrument> -->
+        <javac destdir="${build.test.classes}" debug="${debug.flag}" includeantruntime="false">
+            <src path="${test.src.dir}"/>
+            <exclude name="**/ui/*"/>
+            <classpath>
+                <path refid="classpath"/>
+                <pathelement path="${build.classes}"/>
+                <path refid="junit.classpath"/>
+            </classpath>
+        </javac>
+        <copy todir="${build.test.data}">
+            <fileset dir="${test.data.dir}">
+                <include name="**/*" />
+            </fileset>
+        </copy>     
+    </target>
+
+    <target name="compile-test-gui" depends="compile-test" if="abbot.dir" >
+        <javac destdir="${build.test.classes}" debug="${debug.flag}" includeantruntime="false">
+            <src path="${test.src.dir}"/>
+            <include name="**/ui/*"/>
+            <classpath>
+                <path refid="classpath"/>
+                <path refid="junit.classpath"/>
+                <path refid="abbot.classpath"/>
+                <pathelement path="${build.classes}"/>
+            </classpath>
+        </javac>
+        <copy todir="${build.test.data}">
+            <fileset dir="${test.data.dir}">
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>     
+        <copy todir="${build.test.classes}">
+            <fileset dir="${test.src.dir}">
+                <include name="**/*.prefs" />
+            </fileset>
+        </copy>     
+    </target>
+
+    <target name="instrument" depends="compile">
+        <delete file="cobertura.ser" />
+    	<property name="instrumented" value="yes"/>
+        <cobertura-instrument todir="${build.instrumented.classes}">
+            <fileset dir="build/classes">
+                <include name="**/*.class"/>
+                <include name="**/*.properites"/>
+            </fileset>
+        </cobertura-instrument>
+    </target>
+
+
+	<!-- NOTE: I had difficulty getting the manafest classpath to work
+		this needs to be relative to the location of the app jar if we
+		want to be able to invoke the app via java -jar app.jar
+	 -->
+	
+	<!-- when deployed 3rd party jars will be in the same dir as the app jar -->
+	<pathconvert refid="classpath" property="relclasspath">
+		<mapper type="flatten"/>		
+	</pathconvert>
+
+	<!-- we use the flattened jar path in the manifest -->
+	<manifestclasspath property="jar.classpath" jarfile="${jar.name}">
+		<classpath path="${relclasspath}"> 
+		</classpath>
+	</manifestclasspath>
+
+	<target name="jar" depends="compile">
+		<echo message="jar.classpath is ${jar.classpath}"/>
+		<echo message="relclasspath is ${relclasspath}"/>
+		<echo message="xclasspath is ${xclasspath}"/>
+		<jar jarfile="${build.lib}/${jar.name}" 
+		  basedir="${build.classes}">
+			<manifest>
+				<attribute name="Main-Class" value="org.wtdiff.util.DirCmp"/>
+				<attribute name="Class-Path" value="${jar.classpath}"/>
+			</manifest>
+		</jar>
+	</target>
+		
+    
+    <target name="test-base" depends="compile-test">
+        <junit printsummary="yes" fork="yes" haltonfailure="yes" filtertrace="off" >
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                    file="${basedir}/cobertura.ser" />
+            <sysproperty key="abbot.robot.mode" value="awt" /> 
+            <classpath>
+                <pathelement path="${build.instrumented.classes}"/>
+                <pathelement path="${build.classes}"/>
+                <pathelement path="${build.test.classes}"/>
+                <pathelement path="${build.test.data}"/>
+                <path refid="classpath"/>
+            </classpath>
+            <classpath refid="junit.classpath"/>
+            <classpath refid="cobertura.classpath"/>
+            <formatter type="xml"/>
+            <test todir="${test.out.dir}"  name="${testcase}" if="testcase"/> 
+            <batchtest todir="${test.out.dir}" unless="testcase">
+                <fileset dir="${build.test.classes}">
+                    <include name="**/Test*.class"/>
+                    <exclude name="**/ui/*.class"/>
+                    <exclude name="**/Test*$*.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="test-gui" depends="compile-test-gui" if="abbot.dir">
+        <junit printsummary="yes" fork="yes" haltonfailure="yes" filtertrace="off" >
+            <sysproperty key="net.sourceforge.cobertura.datafile"
+                    file="${basedir}/cobertura.ser" />
+            <sysproperty key="abbot.robot.mode" value="awt" /> 
+            <classpath>
+                <pathelement path="${build.instrumented.classes}"/>
+                <pathelement path="${build.classes}"/>
+                <pathelement path="${build.test.classes}"/>
+                <pathelement path="${build.test.data}"/>
+                <path refid="classpath"/>
+            </classpath>
+            <classpath refid="junit.classpath"/>
+            <classpath refid="cobertura.classpath" />
+            <classpath refid="abbot.classpath" />
+            <formatter type="xml"/>
+            <test todir="${test.out.dir}"  name="${testcase}" if="testcase"/> 
+            <batchtest  todir="${test.out.dir}" unless="testcase">
+                <fileset dir="${build.test.classes}">
+                    <include name="**/ui/Test*.class"/>
+                    <exclude name="**/ui/Test*$*.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+	<target name="test" depends="test-base,test-gui">
+        <junitreport todir="${test.out.dir}"> 
+            <fileset dir="${test.out.dir}"> 
+                <include name="TEST-*.xml"/> 
+            </fileset> 
+            <report format="frames" todir="${test.reports.dir}"/> 
+        </junitreport> 
+    </target>
+
+	
+    <target name="coverage" depends="instrument,test">
+        <cobertura-report srcdir="${src.dir}" destdir="${build.coverage.dir}"/>
+    </target>
+
+    <target name="coverage-gui" depends="instrument,test-gui">
+        <cobertura-report srcdir="${src.dir}" destdir="${build.coverage.dir}"/>
+    </target>
+
+    <target name="coverage-base" depends="instrument,test-base">
+        <cobertura-report srcdir="${src.dir}" destdir="${build.coverage.dir}"/>
+    </target>
+
+    <target name="coverage-check">
+        <cobertura-check>
+            <regex pattern="org.wtdiff.util.*" branchrate="80" linerate="90"/>
+        </cobertura-check>
+    </target>
+
+	<target name="deploy" depends="jar">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/bin"/>
+		<mkdir dir="${dist.dir}/lib"/>
+		<mkdir dir="${dist.dir}/doc"/>
+		
+		<copy todir="${dist.dir}/lib">
+			<mapper type="flatten"/>
+			<fileset dir="${build.lib}">
+				<include name="**/*.jar"/>
+			</fileset>	
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+			</fileset>	
+		</copy>
+        <mkdir dir="${stage.bin.dir}/${final.name}"/>
+        <copy todir="${stage.bin.dir}/${final.name}">
+            <fileset dir="${build.scripts}">
+                <include name="**/*" />
+            </fileset>
+            <fileset dir="${build.lib}">
+                <include name="**/*.jar" />
+            </fileset>
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>  
+        <copy todir="${stage.bin.dir}/${final.name}">
+            <fileset dir=".">
+                <include name="LICENSE.txt"/>
+                <include name="NOTICE.txt"/>
+                <include name="RELEASE-NOTES.txt"/>
+                <include name="README.txt"/>
+            </fileset>
+        </copy>  
+        <zip  zipfile="${dist.dir}/${final.name}.zip">
+            <zipfileset dir="${stage.bin.dir}" filemode="755">
+                <include name="**/*.sh"/>
+            </zipfileset>               
+            <zipfileset dir="${stage.bin.dir}">
+                <exclude name="**/*.sh"/>
+            </zipfileset>                
+        </zip>
+            
+	    <tar  tarfile="${dist.dir}/${final.name}.tar" longfile="gnu">
+            <tarfileset dir="${stage.bin.dir}" filemode="755">
+                <include name="**/*.sh"/>
+            </tarfileset>               
+            <tarfileset dir="${stage.bin.dir}">
+                <exclude name="**/*.sh"/>
+            </tarfileset>                
+	    </tar>
+        <gzip     src="${dist.dir}/${final.name}.tar"     zipfile="${dist.dir}/${final.name}.tar.gz"/>
+
+        <mkdir dir="${stage.src.dir}/${final.name}-src"/>
+        <copy todir="${stage.src.dir}/${final.name}-src/src">
+            <fileset dir="${src.dir}">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <copy todir="${stage.src.dir}/${final.name}-src/test">
+            <fileset dir="${test.src.dir}">
+                <include name="**/*" />
+            </fileset>
+        </copy>
+        <copy todir="${stage.src.dir}/${final.name}-src/lib">
+            <fileset dir="${lib.dir}">
+                <include name="**/*.jar"/>
+            </fileset>
+        </copy>  
+        <copy todir="${stage.src.dir}/${final.name}-src">
+            <fileset dir=".">
+                <include name="build.xml"/>
+            </fileset>
+        </copy>  
+        <copy todir="${stage.src.dir}/${final.name}-src">
+            <fileset dir=".">
+                <include name="BUILDING.txt"/>
+                <include name="LICENSE.txt"/>
+                <include name="NOTICE.txt"/>
+                <include name="RELEASE-NOTES.txt"/>
+                <include name="README.txt"/>
+            </fileset>
+        </copy>  
+
+        <zip  zipfile="${dist.dir}/${final.name}-src.zip"  basedir="${stage.src.dir}"/>
+        <tar  tarfile="${dist.dir}/${final.name}-src.tar" basedir="${stage.src.dir}" longfile="gnu"/>
+        <gzip     src="${dist.dir}/${final.name}-src.tar" zipfile="${dist.dir}/${final.name}-src.tar.gz"/>
+	    
+	    <!-- clean up staging directories -->
+	    <delete    dir="${stage.bin.dir}"/>
+	    <delete    dir="${stage.src.dir}"/>
+
+	    
+	</target>
+	
+	<target name="all" depends="prepare,compile,jar,deploy">
+	</target>
+	
+</project>

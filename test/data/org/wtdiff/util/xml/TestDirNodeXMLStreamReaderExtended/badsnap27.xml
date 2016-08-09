@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- file missing size attribute -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123">
+<files>
+<!-- file attributes "name", "size", "time", "istext", "type" -->
+<file name="nm" time="2015-04-15T15:35:30.000+0000" istext="yes" type="regfile"/>
+</files>
+</dir>
+</snapshot>
+</file-tree-snapshot>

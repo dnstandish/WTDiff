@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- comment embedded in text should be OKt -->
+<file-tree-snapshot>
+<user>fr<!-- embedded comment -->ed</user>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="top"/>
+</snapshot>
+</file-tree-snapshot>

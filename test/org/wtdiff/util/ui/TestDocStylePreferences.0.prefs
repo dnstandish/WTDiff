@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE preferences SYSTEM "http://java.sun.com/dtd/preferences.dtd">
+<preferences EXTERNAL_XML_VERSION="1.0">
+  <root type="user">
+    <map/>
+    <node name="org">
+      <map/>
+      <node name="wtdiff">
+        <map/>
+        <node name="util">
+          <map/>
+          <node name="ui">
+            <map/>
+            <node name="TestDocStylePreferences">
+              <map/>
+              <node name="0"> <!-- version 0 -->
+                <map/>
+                <node name="test1">
+                  <map/>
+                  <node name="sub1">
+                    <map>
+                      <entry key="Monospaced" value="true"/>
+                      <entry key="bgcolor" value="65793"/> <!-- 0x010101-->
+                      <entry key="bold" value="true"/>
+                      <entry key="fgcolor" value="1052688"/> <!-- 0x101010 -->
+                      <entry key="italic" value="false"/>
+                    </map>
+                  </node>
+                  <node name="sub2">
+                    <map>
+                      <entry key="Monospaced" value="false"/>
+                      <entry key="bgcolor" value="131586"/> <!-- 0x020202-->
+                      <entry key="bold" value="false"/>
+                      <entry key="fgcolor" value="2105376"/> <!-- 0x202020 -->
+                      <entry key="italic" value="true"/>
+                    </map>
+                  </node>
+                  <node name="sub3">
+                    <map>
+                      <entry key="Monospaced" value="false"/>
+                    </map>
+                  </node>
+                </node>
+              </node>
+            </node>
+          </node>
+        </node>
+      </node>
+    </node>
+  </root>
+</preferences>

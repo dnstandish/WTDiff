@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<!-- digest-name should not be direct child of file-tree-snapshot -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digest-name name="CRC32"/>
+<snapshot>
+<dir name="adir"/>
+</snapshot>
+</file-tree-snapshot>

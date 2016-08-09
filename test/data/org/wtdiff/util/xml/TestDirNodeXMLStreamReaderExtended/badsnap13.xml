@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- cannot nest digests-available elements -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digests-available>
+<digest-name name="CRC32"/>
+</digests-available>
+</digests-available>
+<snapshot>
+<dir name="adir"/>
+</snapshot>
+</file-tree-snapshot>

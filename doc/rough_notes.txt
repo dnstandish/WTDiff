@@ -1,0 +1,1275 @@
+Symbolic links and "special" files.
+The following code (adhoc:SymlinkExploer) explores the issue. 
+Note camparison of canonical vs absolute file is reportedly used by 
+apache commons-io (this seems to fail in one edge case below)
+
+	public static void main(String[] args) {
+        for(int i = 0 ; i < args.length; i++) {
+            try {
+                File f = new File(args[i]);
+                boolean isFile = f.isFile();
+                boolean isDir = f.isDirectory();
+                boolean exists = f.exists();
+                System.out.println(args[i] + " exists " + exists + " is file " + isFile + " is dir " + isDir);
+                File canon;
+                if (f.getParent() == null) {
+                  canon = f;
+                } else {
+                  File canonDir = f.getParentFile().getCanonicalFile();
+                  canon = new File(canonDir, f.getName());
+                }
+                System.out.println("canon.getCanonicalFile(): " + canon.getCanonicalFile());
+                System.out.println("canon.getAbsoluteFile(): " + canon.getAbsoluteFile());
+                boolean isSymlink = Files.isSymbolicLink(f.toPath());
+                boolean isRegularFile = Files.isRegularFile(f.toPath());
+                System.out.println(args[i] + " is symlink " + isSymlink + " is reg file " + isRegularFile );
+                System.out.println();
+                
+            } catch (Exception e) {
+                e.printStackTrace(); 
+            }
+        }
+
+
+> ~/tmp/a$ ls -lR /home/davidst/tmp/a
+/home/davidst/tmp/a:
+total 4
+lrwxrwxrwx 1 davidst davidst    4 Jul 10 13:35 b -> ../a
+lrwxrwxrwx 1 davidst davidst    1 Jul 10 18:49 c -> d
+lrwxrwxrwx 1 davidst davidst    1 Jul 10 18:48 e -> e
+drwxrwxr-x 2 davidst davidst 4096 Jul 10 18:52 f
+prw-rw-r-- 1 davidst davidst    0 Jul 10 18:46 FIFO
+lrwxrwxrwx 1 davidst davidst    1 Jul 10 18:52 g -> f
+-rw-rw-r-- 1 davidst davidst    0 Jul 10 19:45 h
+lrwxrwxrwx 1 davidst davidst    1 Jul 10 19:45 i -> h
+
+/home/davidst/tmp/a/f:
+total 0
+
+Program output
+
+home/davidst/tmp/a/b exists true is file false is dir true
+canon.getCanonicalFile(): /home/davidst/tmp/a
+canon.getAbsoluteFile(): /home/davidst/tmp/a/b
+/home/davidst/tmp/a/b is symlink true is reg file false
+
+/home/davidst/tmp/a/c exists false is file false is dir false
+canon.getCanonicalFile(): /home/davidst/tmp/a/c
+canon.getAbsoluteFile(): /home/davidst/tmp/a/c
+/home/davidst/tmp/a/c is symlink true is reg file false
+
+/home/davidst/tmp/a/e exists false is file false is dir false
+canon.getCanonicalFile(): /home/davidst/tmp/a/e
+canon.getAbsoluteFile(): /home/davidst/tmp/a/e
+/home/davidst/tmp/a/e is symlink true is reg file false
+
+/home/davidst/tmp/a/g exists true is file false is dir true
+canon.getCanonicalFile(): /home/davidst/tmp/a/f
+canon.getAbsoluteFile(): /home/davidst/tmp/a/g
+/home/davidst/tmp/a/g is symlink true is reg file false
+
+/home/davidst/tmp/a/i exists true is file true is dir false
+canon.getCanonicalFile(): /home/davidst/tmp/a/h
+canon.getAbsoluteFile(): /home/davidst/tmp/a/i
+/home/davidst/tmp/a/i is symlink true is reg file true
+
+/dev/tty exists true is file false is dir false
+canon.getCanonicalFile(): /dev/tty
+canon.getAbsoluteFile(): /dev/tty
+/dev/tty is symlink false is reg file false
+
+/home/davidst/tmp/a/FIFO exists true is file false is dir false
+canon.getCanonicalFile(): /home/davidst/tmp/a/FIFO
+canon.getAbsoluteFile(): /home/davidst/tmp/a/FIFO
+/home/davidst/tmp/a/FIFO is symlink false is reg file false
+
+
+
+
+Zip Files and symlinks
+Info-Zip suports symlinks.
+I think the contents of the entry is the text of the link.
+Java.util.zip doesn't appear to give access to the information that identifies a symlink.
+I suspect it is in the OS specific data for the entry.
+It does not appear to be in the "extra" field.
+
+davidst@weeble:~/tmp/test$ unzip -l 123.zip
+Archive:  123.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        5  2014-08-06 15:37   123.txt
+        7  2014-08-06 15:42   123.symlink
+---------                     -------
+       12                     2 files
+
+extra data for the 2 entries per java
+123.txt
+[85, 84, 5, 0, 3, -17, -125, -30, 83, 117, 120, 11, 0, 1, 4, -24, 3, 0, 0, 4, -24, 3, 0, 0]
+123.symlink
+[85, 84, 5, 0, 3, 43, -123, -30, 83, 117, 120, 11, 0, 1, 4, -24, 3, 0, 0, 4, -24, 3, 0, 0]
+
+85 84 -> x5455 is extended time stamp type data (5 bytes?).  There is nothing distinctive 
+btween the rest of the extra data.
+
+
+It is possible to create a zip file with only a directory entry and that entry being "/"
+info-zip zip command objects, but it is possble via java.
+
+It is possbile to create zip entries with leading "/" using java.
+
+NIO does throw exception when trying to list files for a directory w/o read permission
+
+NIO does NOT throw exception for files in a directory w/o execute permission
+interestingly both exists and not exists return false
+/home/davidst/tmp/a/noexec/123
+directory(nofollow) false
+directory false
+reg(nofollow) false
+reg false
+executable false
+readable false
+writeable false
+symlink false
+exists false
+not exists false
+ 
+ 
+20140823
+-----------
+
+performance
+ ~16GB
+ ~76k files
+
+davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+Sat Aug 23 18:36:17 EDT 2014
+Sat Aug 23 18:49:27 EDT 2014
+
+real    13m9.365s
+user    1m20.304s
+sys     0m47.476s
+
+Note exception if a file disappears (in this case I had eclipse open at the start but closed it shortly after)
+
+davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+Sat Aug 23 19:00:16 EDT 2014
+Exception in thread "main" java.io.FileNotFoundException: /home/davidst/.eclipse/org.eclipse.platform_3.8_155965261/configuration/org.eclipse.core.runtime/.manager/.tmp4959908947136546827.instance (No such file or directory)
+        at java.io.FileInputStream.open(Native Method)
+        at java.io.FileInputStream.<init>(FileInputStream.java:146)
+        at org.standev.util.FileSystemFileNode.getInputStream(FileSystemFileNode.java:161)
+        at org.standev.util.FileNode.compareContent(FileNode.java:212)
+        at org.standev.util.FileNode.compareDetails(FileNode.java:191)
+        at org.standev.util.TreeComparor.compareDetails(TreeComparor.java:360)
+        at org.standev.util.TreeComparor.CompareFileNodes(TreeComparor.java:264)
+        at org.standev.util.TreeComparor.compare(TreeComparor.java:92)
+        at org.standev.util.TreeComparor.CompareDirNodes(TreeComparor.java:199)
+        at org.standev.util.TreeComparor.compare(TreeComparor.java:93)
+        at org.standev.util.TreeComparor.CompareDirNodes(TreeComparor.java:199)
+        at org.standev.util.TreeComparor.compare(TreeComparor.java:93)
+        at org.standev.util.TreeComparor.CompareDirNodes(TreeComparor.java:199)
+        at org.standev.util.TreeComparor.compare(TreeComparor.java:93)
+        at org.standev.util.TreeComparor.CompareDirNodes(TreeComparor.java:199)
+        at org.standev.util.TreeComparor.compare(TreeComparor.java:93)
+        at org.standev.util.TreeComparor.CompareDirNodes(TreeComparor.java:199)
+        at org.standev.util.TreeComparor.compare(TreeComparor.java:93)
+        at org.standev.util.ZipCompareController.compare(ZipCompareController.java:333)
+        at org.standev.util.ZipCmp.main(ZipCmp.java:113)
+Sat Aug 23 19:08:11 EDT 2014
+
+real    7m55.350s
+user    1m5.008s
+sys     0m36.004s
+davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+Sat Aug 23 19:08:41 EDT 2014
+Sat Aug 23 19:21:39 EDT 2014
+
+real    12m57.916s
+user    1m22.768s
+sys     0m47.840s
+
+
+Change inputstream to boffered input stream to see is that affects performance (note still reading in 512 chunks)
+- no real difference
+
+davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+Sat Aug 23 19:34:54 EDT 2014
+Sat Aug 23 19:48:04 EDT 2014
+
+real    13m9.531s
+user    1m21.204s
+sys     0m47.748s
+
+Change buffer to 4096
+- no improvement
+davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+Sat Aug 23 19:54:01 EDT 2014
+Sat Aug 23 20:07:11 EDT 2014
+
+real    13m9.755s
+user    1m7.048s
+sys     0m51.088s
+
+
+Compare read IO to cat.
+- hmm, if cat is any indication performance is not bad 
+davidst@weeble:~$ date ; find . -type f -print0 | xargs -0 cat > /dev/null ; date
+Sat Aug 23 20:30:49 EDT 2014
+[5]+  Done                    eclipse
+Sat Aug 23 20:40:20 EDT 2014
+
+Change FileNode.compareConyent() back to original
+
+
+=================================
+2014/08/29
+=================================
+davidst@weeble:~/prog/java/ZipCmp$ java -Duser.country=CA -Duser.language=fr -jar dist/lib/ZipCmp.jar -d ~/tmp/a/b -d ~/tmp/a -p -t
+- gives French version of localized messages, but built-in exception messages still English
+
+davidst@weeble:~/prog/java/ZipCmp$ LANGUAGE=fr java -Duser.country=CA -Duser.language=fr -jar dist/lib/ZipCmp.jar -d ~/tmp/a/b -d ~/tmp/a -p -t
+- gives French version of localized messages and built-in exception messages
+
+
+====================================
+2014/11/05
+====================================
+
+"Windows" chatracter set (Windows-1252 or CP-1252) is a superset of iso-8859-1, adding characters in the upper control char area.
+
+Given that the files for this application might not be native to the platform it is being run on, 
+the diff feature might need to support other character encodings than just the default.
+
+Detection of encoding is tricky.  I tried to do this via a Reader thinking it would throw an exception if it ran 
+into byte sequences that didn't decode, but this didn't happen.
+
+====================================
+2015/03/18
+====================================
+
+Can create valid UTF16 characters that include linefeed byte in valid 2 byte character.  Can use this to create data that 
+has different line breaks depending on encoding.
+
+====================================
+2015/03/19
+====================================
+
+JTextPane looks like it may not have a way to make a given place in a document visible (at least for Text).
+Given nonwrappaing text may be able to use line count to infer positioni, then invoke sutable JScrollPane method.
+
+
+====================================
+2015/03/20
+====================================
+DiffController.getNormalDiff()
+2d1
+< B
+4c3
+< C
+---
+> D
+5a5,6
+> F
+> G
+7,8c8,9
+< H
+< H
+---
+> I
+> J
+11d11
+< c
+15c15
+< g
+---
+> x
+18,19d17
+< j
+< k
+22a21
+> o
+NormalDiffFormatter/NormalDocumentDiffWriter
+2d1
+< B
+4c3
+< C
+---
+> D
+5a5,6
+> F
+> G
+7,8c8,9
+< H
+< H
+---
+> I
+> J
+11d11
+< c
+15c15
+< g
+---
+> x
+18,19d17
+< j
+< k
+22a21
+> o
+
+====================================
+2015/04/08
+====================================
+
+~/prog/java/ZipCmp$ for i in 1 2 3 4 5 ; do ant clean; ant coverage-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; else echo success >> delme.out  ; fi; echo $i ; done
+
+~/prog/java/ZipCmp$ cat delme.out 
+FAIL 1
+FAIL 2
+success
+FAIL 4
+success
+
+~/prog/java/ZipCmp$ for i in 1 2 3 4 5 ; do  ant coverage-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; else echo success >> delme.out  ; fi; echo $i ; done
+
+~/prog/java/ZipCmp$ cat delme.out
+success
+success
+FAIL 3
+success
+success
+/prog/java/ZipCmp$ for i in 1 2 3 4 5 ; do  ant coverage-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; break ; else echo success >> delme.out  ; fi; echo $i ; done
+~/prog/java/ZipCmp$ cat delme.out
+success
+success
+FAIL 3
+success
+success
+success
+success
+FAIL 3
+  <testcase classname="org.standev.util.ui.TestDiffFrame" name="testMenuNotStandalone" time="1.604">
+    <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
+        at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
+        at java.util.WeakHashMap$KeyIterator.next(WeakHashMap.java:915)
+        at java.util.AbstractSet.removeAll(AbstractSet.java:173)
+        at abbot.finder.TestHierarchy.getRoots(TestHierarchy.java:82)
+        at junit.extensions.abbot.ComponentTestFixture.disposeAll(ComponentTestFixture.java:331)
+        at junit.extensions.abbot.ComponentTestFixture$1.disposeAll(ComponentTestFixture.java:307)
+        at abbot.util.AWTFixtureHelper.dispose(AWTFixtureHelper.java:185)
+        at junit.extensions.abbot.ComponentTestFixture.fixtureTearDown(ComponentTestFixture.java:318)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:387)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+FAIL 1
+BUILD FAILED
+/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestDiffOpenDialog failed
+
+  <testcase classname="org.standev.util.ui.TestDiffOpenDialog" name="testFolderButton" time="0.711">
+    <error message="No Component found with matcher &apos;org.standev.util.ui.CommonComponentTestFixture$JLabelAndTextMatcher@10c93d7&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.CommonComponentTestFixture$JLabelAndTextMatcher@10c93d7&apos;
+        at abbot.finder.BasicFinder.find(BasicFinder.java:87)
+        at abbot.finder.BasicFinder.find(BasicFinder.java:65)
+        at org.standev.util.ui.TestDiffOpenDialog.testFolderButton(TestDiffOpenDialog.java:337)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at junit.framework.TestCase.runTest(TestCase.java:168)
+        at junit.framework.TestCase.runBare(TestCase.java:134)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:379)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+FAIL 3
+/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpFrame failed
+ <testcase classname="org.standev.util.ui.TestZipCmpFrame" name="testIgnoreNameCaseMenuItem" time="1.668">
+    <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
+        at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
+        at java.util.WeakHashMap$KeyIterator.next(WeakHashMap.java:915)
+        at java.util.AbstractSet.removeAll(AbstractSet.java:173)
+        at abbot.finder.TestHierarchy.getRoots(TestHierarchy.java:82)
+        at junit.extensions.abbot.ComponentTestFixture.disposeAll(ComponentTestFixture.java:331)
+        at junit.extensions.abbot.ComponentTestFixture$1.disposeAll(ComponentTestFixture.java:307)
+        at abbot.util.AWTFixtureHelper.dispose(AWTFixtureHelper.java:185)
+        at junit.extensions.abbot.ComponentTestFixture.fixtureTearDown(ComponentTestFixture.java:318)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:387)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+FAIL 1
+/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpTreePanel failed
+  <testcase classname="org.standev.util.ui.TestZipCmpTreePanel" name="testPanelFolder" time="1.133">
+    <error message="No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$20@a2a147&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$20@a2a147&apos;
+        at abbot.finder.BasicFinder.find(BasicFinder.java:87)
+        at abbot.finder.BasicFinder.find(BasicFinder.java:65)
+        at org.standev.util.ui.TestZipCmpTreePanel.testPanelFolder(TestZipCmpTreePanel.java:436)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at junit.framework.TestCase.runTest(TestCase.java:168)
+        at junit.framework.TestCase.runBare(TestCase.java:134)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:379)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpTreePanel failed
+FAIL 2  <testcase classname="org.standev.util.ui.TestZipCmpTreePanel" name="testPanelFolder" time="0.631">
+    <error message="No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$18@1e8e2db&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$18@1e8e2db&apos;
+        at abbot.finder.BasicFinder.find(BasicFinder.java:87)
+        at abbot.finder.BasicFinder.find(BasicFinder.java:65)
+        at org.standev.util.ui.TestZipCmpTreePanel.testPanelFolder(TestZipCmpTreePanel.java:416)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at junit.framework.TestCase.runTest(TestCase.java:168)
+        at junit.framework.TestCase.runBare(TestCase.java:134)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:379)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+Modify org.standev.util.ui.TestZipCmpTreePanel testPanelFolder code in several places add 
+            if ( ! chooser.isValid() ) {
+                Thread.sleep(1000);
+                if ( ! chooser.isValid() ) {
+                    System.out.println("CHOOSER STILL NOT VALID");
+                }
+            }
+            
+~/prog/java/ZipCmp$ for i in 1 2 3 4 5 ; do  ant coverage-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; break ; else echo success >> delme.out  ; fi; echo $i ; done
+
+- no failures
+
+~/prog/java/ZipCmp$ for i in 1 2 3 4 5 6 7 8 9 0 ; do  ant coverage-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; break ; else echo success >> delme.out  ; fi; echo $i ; done
+FAIL 0
+- failed on 10th try
+/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpFrame failed
+  <testcase classname="org.standev.util.ui.TestZipCmpFrame" name="testTextCompareMenuItem" time="1.662">
+    <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
+        at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
+        at java.util.WeakHashMap$KeyIterator.next(WeakHashMap.java:915)
+        at java.util.AbstractSet.removeAll(AbstractSet.java:173)
+        at abbot.finder.TestHierarchy.getRoots(TestHierarchy.java:82)
+        at junit.extensions.abbot.ComponentTestFixture.disposeAll(ComponentTestFixture.java:331)
+        at junit.extensions.abbot.ComponentTestFixture$1.disposeAll(ComponentTestFixture.java:307)
+        at abbot.util.AWTFixtureHelper.dispose(AWTFixtureHelper.java:185)
+        at junit.extensions.abbot.ComponentTestFixture.fixtureTearDown(ComponentTestFixture.java:318)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:387)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+
+~/prog/java/ZipCmp/test-out$ grep CHOOSER TEST-org.standev.util.ui.TestZipCmpTreePanel.xml
+CHOOSER STILL NOT VALID
+CHOOSER STILL NOT VALID
+CHOOSER STILL NOT VALID
+CHOOSER STILL NOT VALID
+CHOOSER STILL NOT VALID
+CHOOSER STILL NOT VALID
+
+
+hmm.... chooser is never valid.
+Try following code instead
+            if ( ! chooser.isVisible() ) { //TODO verify this helps.  if so then bundle together in common code DRY
+                System.out.println("CHOOSER NOT VISIBLE");
+                Thread.sleep(1000);
+                if ( ! chooser.isVisible() ) {
+                    System.out.println("CHOOSER STILL NOT VISIBLE");
+                }
+            }
+
+Temporary change to build.xml to only run TestZipCmpTreePanel tests.
+
+back to old error            
+  <testcase classname="org.standev.util.ui.TestZipCmpTreePanel" name="testPanelFolder" time="0.648">
+    <error message="No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$18@1a8d36&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$18@1a8d36&apos;
+        at abbot.finder.BasicFinder.find(BasicFinder.java:87)
+        at abbot.finder.BasicFinder.find(BasicFinder.java:65)
+        at org.standev.util.ui.TestZipCmpTreePanel.testPanelFolder(TestZipCmpTreePanel.java:423)
+        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:57)
+        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.lang.reflect.Method.invoke(Method.java:606)
+        at junit.framework.TestCase.runTest(TestCase.java:168)
+        at junit.framework.TestCase.runBare(TestCase.java:134)
+        at junit.extensions.abbot.ComponentTestFixture.runBare(ComponentTestFixture.java:379)
+        at junit.framework.TestResult$1.protect(TestResult.java:110)
+        at junit.framework.TestResult.runProtected(TestResult.java:128)
+        at junit.framework.TestResult.run(TestResult.java:113)
+        at junit.framework.TestCase.run(TestCase.java:124)
+        at junit.framework.TestSuite.runTest(TestSuite.java:243)
+        at junit.framework.TestSuite.run(TestSuite.java:238)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.run(JUnitTestRunner.java:532)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.launch(JUnitTestRunner.java:1165)
+        at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
+</error>
+
+for i in 1 2 3 4 5 6 7 8 9 0 ; do  ant test-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; else echo success $i >> delme.out  ; fi; echo $i ; done
+FAIL 1
+success 2
+FAIL 3
+success 4
+FAIL 5
+success 6
+FAIL 7
+success 8
+FAIL 9
+success 0
+
+success 0
+FAIL 1
+success 2
+FAIL 3
+success 4
+success 5
+FAIL 6
+FAIL 7
+success 8
+success 9
+success 0
+
+success 1
+success 2
+FAIL 3
+success 4
+success 5
+success 6
+success 7
+FAIL 8
+success 9
+success 0
+
+success 1
+success 2
+success 3
+FAIL 4
+success 5
+success 6
+success 7
+success 8
+success 9
+FAIL 0
+
+success 1
+success 2
+success 3
+success 4
+success 5
+success 6
+success 7
+success 8
+success 9
+success 0
+
+success 1
+success 2
+success 3
+success 4
+success 5
+success 6
+success 7
+success 8
+success 9
+success 0
+
+- is there a timing issue that that is reduced due to disk IO chaching? 
+ant clean
+
+success 1
+success 2
+FAIL 3
+success 4
+success 5
+success 6
+success 7
+success 8
+success 9
+FAIL 0
+
+success 1
+success 2
+success 3
+FAIL 4
+success 5
+success 6
+success 7
+success 8
+success 9
+FAIL 0
+
+success 1
+success 2
+success 3
+success 4
+success 5
+FAIL 6
+success 7
+success 8
+success 9
+success 0
+
+FAIL 1
+success 2
+success 3
+FAIL 4
+success 5
+success 6
+success 7
+success 8
+success 9
+success 0
+
+try run of 100 trials, browser and eclipse shutdown start around 12:55 AM
+~/prog/java/ZipCmp$ for j in 0 1 2 3 4 5 6 7 8 9 ;  do for i in 0 1 2 3 4 5 6 7 8 9  ; do  ant test-gui ; if [ $? -ne 0 ] ; then echo FAIL $j$i >> delme.out; else echo success $j$i >> delme.out  ; fi; echo $j$i ; done ; done
+
+FAIL 04
+FAIL 19
+FAIL 40
+FAIL 44
+
+====================================
+2015/04/08
+====================================
+
+~/prog/java/ZipCmp$ for j in 0 1  ;  do for i in 0 1 2 3 4 5 6 7 8 9  ; do  ant -Dtestcase=org.standev.util.ui.TestDiffOpenDialog test-gui ; if [ $? -ne 0 ] ; then echo FAIL $j$i >> delme.out; else echo success $j$i >> delme.out  ; fi; echo $j$i ; done ; done
+
+success 00
+success 01
+FAIL 02
+success 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+again
+FAIL 00
+success 01
+FAIL 02
+FAIL 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+FAIL 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+echo 3 | sudo tee /proc/sys/vm/drop_caches 
+
+success 00
+FAIL 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+FAIL 08
+success 09
+success 10
+success 11
+FAIL 12
+FAIL 13
+success 14
+success 15
+success 16
+success 17
+success 18
+FAIL 19
+
+success 00
+success 01
+success 02
+success 03
+FAIL 04
+success 05
+success 06
+success 07
+FAIL 08
+success 09
+success 10
+success 11
+FAIL 12
+success 13
+FAIL 14
+success 15
+FAIL 16
+success 17
+success 18
+success 19
+
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+FAIL 08
+success 09
+FAIL 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+FAIL 16
+success 17
+success 18
+success 19
+
+success 00
+success 01
+success 02
+success 03
+FAIL 04
+FAIL 05
+FAIL 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+FAIL 14
+success 15
+success 16
+FAIL 17
+success 18
+success 19
+
+- time delay between tests possible cause of error rate increase?
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+FAIL 06
+FAIL 07
+success 08
+success 09
+success 10
+FAIL 11
+FAIL 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+change TestDiffOpenDialog check of starting directory to use chooser.getCurrentDirectory() instead of searching for corresponding JLabel in JFileChooser.
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+echo 3 | sudo tee /proc/sys/vm/drop_caches 
+
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+This suggests sporadic problem with TestDiffOpen JFileChooser tests is solved.  
+Now look at TestZipCmpTreePanel
+
+~/prog/java/ZipCmp$ for j in 0 1  ;  do for i in 0 1 2 3 4 5 6 7 8 9  ; do  ant -Dtestcase=org.standev.util.ui.TestZipCmpTreePanel test-gui ; if [ $? -ne 0 ] ; then echo FAIL $j$i >> delme.out; else echo success $j$i >> delme.out  ; fi; echo $j$i ; done ; done
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+FAIL 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+FAIL 15
+success 16
+success 17
+success 18
+success 19
+
+echo 3 | sudo tee /proc/sys/vm/drop_caches 
+
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+intervening activities
+
+success 00
+FAIL 01
+FAIL 02
+FAIL 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+change interaction with JFileChooser for checking current directory.  Don't need to find componenet, chooser has a getCurrentDirectory() method.
+Also can use cancelSelect() method, though approveSelect() method blows up.
+
+ant clean
+~/prog/java/ZipCmp$ for j in 0 1  ;  do for i in 0 1 2 3 4 5 6 7 8 9  ; do  ant -Dtestcase=org.standev.util.ui.TestZipCmpTreePanel test-gui ; if [ $? -ne 0 ] ; then echo FAIL $j$i >> delme.out; else echo success $j$i >> delme.out  ; fi; echo $j$i ; done ; done
+success 00
+success 01
+success 02
+success 03
+success 04
+success 05
+success 06
+success 07
+success 08
+success 09
+success 10
+success 11
+success 12
+success 13
+success 14
+success 15
+success 16
+success 17
+success 18
+success 19
+
+
+==============================================
+2015/04/21
+============
+
+inconsistent cobertura line counts
+
+While testing junit3 to junit4 test conversion, I found differing line coverage counts in coverage reports
+
+looking in more detail found differences were not due to junit version, but some other issue.
+
+running 
+   ant coverage-base 
+on primary project, sometimes line count for ZipCompareController line 32 is sometimes 5 and sometimes 8.
+
+diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;5</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+
+============
+2015/04/22
+============
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;5</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 21/04/15 5:57 PM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:23 AM.</div>
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;12</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 21/04/15 5:57 PM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:25 AM.</div>
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;12</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 21/04/15 5:57 PM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:29 AM.</div>
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;12</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 21/04/15 5:57 PM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:33 AM.</div>
+
+------------------------------------------
+davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ rm cobertura.ser 
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;15</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 21/04/15 5:57 PM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:35 AM.</div>
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;5</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 21/04/15 5:57 PM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:38 AM.</div>
+
+
+--------------------------------------
+davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant -Dtestcase=org.standev.util.TestZipCompareController coverage-base
+
+
+davidst@weeble:~/prog/java$ grep enum delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+<tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+
+
+davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant -Dtestcase=org.standev.util.TestZipCompareController coverage-base
+
+davidst@weeble:~/prog/java$ grep enum delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+<tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+
+------------------------------------------
+try setting forkmode=once for test-base junit task
+(Note back to running official project)
+davidst@weeble:~/prog/java/ZipCmp$ ant coverage-base
+
+davidst@weeble:~/prog/java$ grep enum ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+<tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+
+(refresh copy of project)
+davidst@weeble:~/prog/java$ cp -a ZipCmp delme_zipcmp
+
+davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant coverage-base
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+1014c1014
+< <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:53 AM.</div>
+---
+> <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:56 AM.</div>
+
+
+davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage delme_zipcmp/ZipCmp/build/coverage | grep -v 'Report generated by'
+- no differences in counts
+
+-------------------------------------------------
+try setting forkmode=once for test-gui junit task
+
+- run full coverage
+
+there are differences, for example
+
+diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;10</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;13</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+
+
+change back to default forkmode
+
+- run full coverage
+
+still differences, for example
+diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;32</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;38</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+1014c1014
+
+run official copy again
+differences still, perhaps greater.
+
+diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+84c84
+< <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;28</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+---
+> <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;38</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
+
+
+ComparisonDirNode counts differ in toString() method.  Could be attributed to gui timing.
+
+Most of the differences could be attributed to gui timing.
+
+The only difference that leaves me wondering is ZipCompareController enum coverage.
+
+=========================================================================
+2015/04/22
+=============
+
+I am sufficiently confident that these minor differences are OK to proceed with testing JuUnit4 -> 4 conversion
+
+First step is to run conversion on copy of project
+
+davidst@weeble:~/prog/perl/java_jumit3_to_junit4$ ./java_junit3_to_junit4.perl  ../../java/delme_zipcmp/ZipCmp/test | tee conversion.log
+
+ant coverage is successful
+
+junit test report shows same number of tests run
+
+coverage report for all shows same line and branch numbers
+
+differences in actual line counts for individual lines are similar to when both JUnit3.
+
+run conversion on official project
+
+davidst@weeble:~/prog/perl/java_jumit3_to_junit4$ ./java_junit3_to_junit4.perl  ../../java/ZipCmp/test | tee conversion_official.log
+
+davidst@weeble:~/prog/java/ZipCmp$ find test/ -name '*.bak' -exec rm {} \;
+
+ant clean
+ant coverage
+
+- successful
+
+Compare JUnit reports  - same
+Compare Coverage reports - differences but similar to previous comparisons
+
+
+
+-----------------------------------------------------------------------------------------------
+
+=========
+20150526
+=========
+sporadic failure org.standev.util.ui.TestDialogErrorHandler
+Dialog missing "Ignore All" button.  
+
+repeat.perl -n 50 -- ant -Dtestcase=org.standev.util.ui.TestDialogErrorHandler test-gui
+- failed on repeat 24
+repeat.perl -n 50 -- ant -Dtestcase=org.standev.util.ui.TestDialogErrorHandler test-gui
+- no failure
+epeat.perl -n 50 -c -- ant -Dtestcase=org.standev.util.ui.TestDialogErrorHandler test-gui
+Failed 2 times out of  50
+Failed 5 times out of  50
+
+- change TestDialogErrorHandler to use ButtonTester instead of doClick()
+no failures out of 50
+no failures out of 50
+no failures out of 50
+no failures out of 50
+
+ant coverage
+BUILD FAILED
+/home/davidst/prog/java/ZipCmp/build.xml:224: Test org.standev.util.ui.TestDiffFrame failed
+  <testcase classname="org.standev.util.ui.TestDiffFrame" name="testMenuNotStandalone" time="30.67">
+    <error message="Can&apos;t obtain position of component &apos;Close&apos; (JMenuItem)" type="abbot.tester.ComponentNotShowingException">abbot.tester.ComponentNotShowingException: Can&apos;t obtain position of component &apos;Close&apos; (JMenuItem)
+        at abbot.tester.Robot.mouseMove(Robot.java:840)
+        at abbot.tester.Robot.mousePress(Robot.java:1143)
+        at abbot.tester.JComponentTester.mousePress(JComponentTester.java:117)
+        at abbot.tester.Robot.click(Robot.java:1228)
+        at abbot.tester.Robot.click(Robot.java:1207)
+        at abbot.tester.Robot.click(Robot.java:1202)
+        at abbot.tester.AbstractButtonTester.actionClick(AbstractButtonTester.java:38)
+        at org.standev.util.ui.TestDiffFrame.testMenuNotStandalone(TestDiffFrame.java:176)
+
+repeat.perl -n 1 -c -- ant -Dtestcase=org.standev.util.ui.TestDiffFrame test-gui
+no failures out of 1
+Failed 1 times out of  10
+
+org.standev.util.ui.TestDiffFrame
+
+=========
+20150527
+=========
+repeat.perl -n 10 -c -- ant -Dtestcase=org.standev.util.ui.TestDiffFrame test-gui
+Failed 2 times out of  10
+
+
+  <testcase classname="org.standev.util.ui.TestDiffFrame" name="testMenuStandalone" time="2.337">
+    <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
+        at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
+        
+  <testcase classname="org.standev.util.ui.TestDiffFrame" name="testMenuStandalone" time="2.225">
+    <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
+        at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
+
+replace direct appFrame.dispose() with one via invokeAndWait()
+
+repeat.perl -n 10  -- ant -Dtestcase=org.standev.util.ui.TestDiffFrame test-gui
+no failures
+
+repeat.perl -n 100 -c  -- ant -Dtestcase=org.standev.util.ui.TestDiffFrame test-gui
+no failures out of 100
+
+
+Run full gui test
+
+repeat.perl -n 1 -c  -- ant test-gui
+BUILD SUCCESSFUL
+Total time: 1 minute 41 seconds
+no failures out of 1
+
+repeat.perl -n 10 -c  -- ant test-gui
+no failures out of 10
+
+repeat.perl -n 1 -c  -- ant coverage
+

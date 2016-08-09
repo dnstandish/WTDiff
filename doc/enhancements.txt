@@ -1,0 +1,58 @@
+Enhancement Ideas
+--------------------
+DONE support (limited) symlinks and special files
+
+DONE In case of file permission problems add option to ignore or simply log problems.
+ DONE for directories
+ DONE for files
+
+DONE Sort files by name instead of using asis order.
+
+DONE internationalize text (English only so far)
+
+DONE capture snapshot of a tree including checksums but excluding content to xml
+  DONE load captured snapshot
+  DONE capture snapshot
+
+INPROGRESS more checksums that just crc32 (for example cryptographic hashes)
+  added MD5 content method to FileNode
+  added MD5 calculation to FileNode
+  added MD5 method to FileSystemFileName, ZipFileNode, MockFileNode  
+
+text CRC32 comparison
+
+tar and tgz format support
+
+INPROGRESS ability to diff changed files
+ context diff
+ unified diff
+ INPROGRESS position to next/previous change
+ file drag/drop
+ find text in diff output
+ user defined text filters (using groovy perhaps?) 
+
+DONE if file in text area doesn't exist, should follow chain up to try and find and existing dir
+
+
+configurable file/directory ignore rules
+
+DONE manual tree alignment
+ DONE can force old of new root
+ DONE indicate forced root or scope of comparison via tree renderer
+ DONE ability to unforce a root (for example popup menu for forced root node would off "unroot" instead of root)   
+ DONE unit tests
+
+DONE build bin and source distribution targets
+
+better text output format
+
+mouse-over (or some other user method) to view file attributes (time, size, ...)
+INPROGRESS using popup menu and dialog
+
+Optionally compare file time and permissions.
+
+ability to to compare text files with sort key as an alternative to text diff. could consider delimited files, CSV, etc.
+
+auto-detection of encoding.  This can be a difficult problem. 
+
+Compare of large directory trees can take a long time.  Add progress indicator.

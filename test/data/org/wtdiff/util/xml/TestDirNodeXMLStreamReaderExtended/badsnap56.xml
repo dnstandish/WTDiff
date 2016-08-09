@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- file names in dir must be unique -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123">
+<files>
+<!-- file attributes "name", "size", "time", "istext", "type" -->
+<file name="dupfile" size="2" time="2015-04-15T07:35:30.400+0000" istext="yes" type="regfile"></file>
+<file name="dup%66ile" size="5" time="2015-04-15T07:35:30.400+0000" istext="yes" type="regfile"></file>
+</files>
+</dir>
+</snapshot>
+</file-tree-snapshot>

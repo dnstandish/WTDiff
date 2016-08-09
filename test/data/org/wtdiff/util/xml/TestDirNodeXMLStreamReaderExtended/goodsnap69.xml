@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- comment between elements OK -->
+<file-tree-snapshot>
+<capture-root>/some/root/path</capture-root>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+</digests-available>
+<snapshot>
+<dir name="123"/>
+</snapshot> <!-- a comment is ok --> 
+</file-tree-snapshot>

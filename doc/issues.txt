@@ -1,0 +1,48 @@
+status type created updated file description
+Closed defect 20150315 - NodePropertiesDialog.java shows /filename for path when single file chosen as root
+Closed defect 20150308 ExceptionInputStream read of multiple bytes does not throw exception
+Closed defect 20150319 DiffPanel does not repaint blank if old diff becomes invalid
+Closed defect 20150321 Diff does not warning of missing final line terminator
+Open defect 20150325 diff missing final line terminator should identify a change in last line
+Open defect 20150330 warning lines prepended with lineno and </> -/+ indicator is this right?
+Closed defect 20150331 diff text wraps if visible width less than length of longest "word"
+Open defect 20150401 should DiffFrame clear itself and panel from controller listeners?  In test situation diff listeners pile up in the controller.
+Closed defect 20150403 when DiffFrame created with a controller linesep and encoding should be initialized from controller
+Open defect 20150403 JFileChooser allows file renaming and folder creation by default.  This is annoying.
+Open defect 20150407 ZipCmpTreePanel (and maybe other places) non IOExceptions (i.e run time exceptions) not caught and not presented to user (for example NullPointerException)
+Closed defect 20150407 TreeAlignmentAnalyser.bestSubTree may throw null pointer exception if a tree sub-branch doesn't extend to desired depth
+Open defect 20150408 test-gui fails sporadically (see rough_notes.txt)
+Closed defect 20150408 lib/ and deploy/lib mix jars used for test and build with those that are needed to run the app
+Closed defect 20150408 test require cobertura test coverage tool.  Should be able run tests independent of cobertura as cobertura changes the classes being tested via instrumentation
+Closed defect 20150409 junit tests have a mixture of junit3 and junit4 - make consistent (except for abbot based stuuf)
+Closed defect 20150410 if last(last visible?) tree node is set to root (Root Here) then unset (Unroot), all the nodes in tree lock to bold
+Closed defect 20150410 all the nodes in tree lock to bold.  force root last visible node, then force it another node
+Closed defect 20150416 test coverage report missing classes with no test coverage
+Closed defect 20150416 test cobertura warnings re multiple loggers
+CLosed defect 20150421 load of coberta.ser results in error "Invalid byte 1 of 1-byte UTF-8 sequence".  Should treat this as a file node.  Suspect XML test is throwing exception that is not caught
+Closed defect 20150424 when invoked with an xml snapshot command line invocation of gui shows blank in file/dir textfield
+Open defect 20150426 is no possible comparison method IllegalArgumentException thrown but not reported via gui
+Closed defect 20150426 force root in panel based on snapshot results in blank compare path. FIX: set root based on snapshot
+Closed defect 20150426 snapshot empty capture-root if node is not top node
+Closed defect 20150426 right arrow key on leaf throws "Exception in thread "AWT-EventQueue-0" java.lang.ClassCastException: org.standev.util.FileSystemFileNode cannot be cast to org.standev.util.DirNode
+    at org.standev.util.ui.ZipCompareTreeModel.getChildCount(ZipCompareTreeModel.java:47) ..."
+Closed defect 20150427 if capture-root contains a backspace character, an error results on load "... An invalid character (Unicode: 0x8) was ...."
+Open defect 20150502 command line invocation with nonexistent file throws exception
+Closed defect 20150505 diff does not update width when display triggered via "show" button
+Closed defect 20150511 Snapshot dialog with fake root "File" is ".xml"  
+    now defaults to snapshot.xml in this case
+Closed defect 20150511 Snapshot dialog with fake complex root (for example a zip or snapshot) "File" includes path of root
+    change Zip and XML builders, name of top dir now only name of file not including path
+Closed defect 20150515 if side by side diff is displayed hitting Diff leaves existing pair of text panes in place and adds 2 more
+    problem caused by attempt to refer to documnet position "-1" in situation where first chagne is at beginning of document 
+Closed defect 20150527 it is possible for a zip file to include more than one file with the same path.  Problem not detected when tree is built, but on comparison.  Should detect and flag problem when tree is built.
+Closed defect 20150603 while windows supports symbolic links, creating symbolic links requires privileges.  If privileges not granted to user running tests, tests throw IOException when determining symlink testability
+Closed defect 20150603 testing of special files fails if mkfifo external program not available
+Closed defect 20150604 TestDiffOpenDialog and TestFileSystemFileNodeTreeBuilder fail under windows7 - various File.set premission methods don't work under windows; also File.canRead() ... don't always work under Windows7
+Closed defect 20150605 test files left over after running tests
+Closed defect 20150605 windows does not allow 2 files whose name differ only in case to reside in same directory
+Closed defect 20150605 TextUtil readerToLines fails to parse lines when linesep is CRLF and and lines ends with CRCRLF
+Closed defect 20150605 TestDiffPanel fails multiple tests under Windows7
+Closed defect 20150605 TestZipCmpTreePanel fails on Windows (exception message is OS specific)
+Closed feature 20150606 app should not need arguments if invoked for gui mode
+Open license 20150801 add copyright notice to source code (add_copyright.perl)

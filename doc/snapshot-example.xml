@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<file-tree-snapshot>
+<capture-time>2015-04-12T02:41:55.234+0000</capture-time>
+<digests-available>
+<digest-name name="CRC32"></digest-name>
+<digest-name name="MD5"></digest-name>
+<digest-name name="SHA-256"/>
+</digests-available>
+<!-- meta info re file tree captured -->
+<user>davidst</user>
+<home>/home/davidst/tmp></home>
+<current-dir>/home/davidst/prog/java/adhoc</current-dir>
+<os>Linux</os>
+<host>weeble</host>
+<snapshot>
+<dir name="test">
+  <files>
+    <file name="crlf.txt" size="66" time="2015-03-13T13:24:44.375641075-0400" istext="yes" type="regfile">
+      <digest name="CRC32">afd21e66</digest>
+      <digest name="MD5">c303dc20c42f0e6876cc467d7d215480</digest>
+      <digest name="SHA256">48f50f5b33390ffc7fa1a4bb39c99fd327f281cf731019eae1fe41d45f56098c</digest>
+    </file>
+    <file name="123.txt" size="4" time="2014-10-30T14:49:04.993319982-0400" istext="yes" type="regfile">
+      <digest name="CRC32">5a82fd08</digest>
+      <digest name="MD5">ba1f2511fc30423bdbb183fe33f3dd0f</digest>
+      <digest name="SHA256">181210f8f9c779c26da1d9b2075bde0127302ee0e3fca38c9a83f5b1dd8e5d3b</digest>
+    </file>  
+    <file name="123.symlink" size="5" time="2014-08-06T15:49:10.672435934-0400" istext="no" type="symlink">
+      <linkto name="h.zip"/>
+    </file>
+    <file name="h.zip" size="154" time="2014-08-05T17:12:19.691533395-0400" istext="no" type="regfile">
+      <digest name="CRC32">7359ce26</digest>
+      <digest name="MD5">ce19cb4c247b949fae1717d4be058d5c</digest>
+      <digest name="SHA256">738ceb44fce6808b99614e6c2441daeb55d9eda12d22715981dd35f853f41e06</digest>
+    </file>
+  </files>
+  <dirs>
+    <dir name="h">
+      <files>
+        <file name="h1" size="0" time="2014-08-06T19:12:15.136855424-0400" istext="no" type="regfile">
+          <digest name="CRC32">00000000</digest>
+          <digest name="MD5">d41d8cd98f00b204e9800998ecf8427e</digest>
+          <digest name="SHA256">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</digest>
+        </file>
+        <file name="h2" size="0" time="2014-08-06T19:12:17.536867325-0400" istext="no" type="regfile">
+          <digest name="CRC32">00000000</digest>
+          <digest name="MD5">d41d8cd98f00b204e9800998ecf8427e</digest>
+          <digest name="SHA256">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</digest>
+        </file>
+        <file name="h3" size="11" time="2015-04-06T15:12:44.757728649-0400" istext="yes" type="regfile">
+          <digest name="CRC32">992f310c</digest>
+          <digest name="MD5">31f480eea066f0b6a4f38d8c5f6bd314</digest>
+          <digest name="SHA256">09a54c2023230c97711009bacada376d0cf78edc61eeae8025c6f9e4f1bce7a2</digest>
+        </file>
+      </files>
+    </dir>
+  </dirs>
+</dir>
+</snapshot>
+<snapshot-digest>
+d6d3b150f1e2754b1e8375ff550a6c80
+</snapshot-digest>
+</file-tree-snapshot>

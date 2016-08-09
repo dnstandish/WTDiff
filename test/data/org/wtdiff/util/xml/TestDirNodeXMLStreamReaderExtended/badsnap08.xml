@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<!-- capture-root should not have attribute -->
+<file-tree-snapshot>
+<capture-root root="asdhfl">/some/root/path</capture-root>
+<snapshot>
+<dir name="adir"/>
+</snapshot>
+</file-tree-snapshot>
