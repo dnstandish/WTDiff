@@ -1,0 +1,7 @@
+.*
+build-*.properties
+build/
+cobertura.ser
+dist/
+lib/*
+test-out/
