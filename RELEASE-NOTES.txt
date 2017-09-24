@@ -1,4 +1,8 @@
 
+WTDiff 0.0.2 Release Notes
+
+Add File Drag and Drop.
+
 WTDiff 0.0.1 Release Notes
 
 WTDiff required Java 7 or later.

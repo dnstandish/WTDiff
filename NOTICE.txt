@@ -1,5 +1,5 @@
 WTDiff 
-Copyright 2015 David Standish
+Copyright 2017 David Standish
 
 diffutils
 Copyright 2010 Dmitry Naumenko (dm.naumenko@gmail.com)
