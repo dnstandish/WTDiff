@@ -105,6 +105,17 @@ public class DiffController {
         }
     }
 
+    public void setSource(SourceType srcType, InputStreamSource src) throws IOException {
+        switch ( srcType ) {
+            case OLD:
+                setOldSource(src);
+                break;
+            case NEW:
+                setNewSource(src);
+                break;
+        }
+    }
+    
     public void setOldSource(InputStreamSource old) throws IOException {
         if ( old == null )
             oldSourceInfo = null;

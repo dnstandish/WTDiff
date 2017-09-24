@@ -27,7 +27,7 @@ INPROGRESS ability to diff changed files
  context diff
  unified diff
  INPROGRESS position to next/previous change
- file drag/drop
+ DONE file drag/drop
  find text in diff output
  user defined text filters (using groovy perhaps?) 
 

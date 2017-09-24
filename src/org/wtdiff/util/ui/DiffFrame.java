@@ -33,7 +33,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -161,6 +163,10 @@ public class DiffFrame extends JFrame implements ActionListener, DiffChangeListe
         oldCharset.addActionListener(this);
         
         Box oldFileBox = createHorizontalBoxedComponents(oldLabel, oldFileName, oldLineSep, oldCharset);
+        if (isStandAlone ) {
+            oldFileName.setTransferHandler(null);
+            addTransferHandler( SourceType.OLD, oldFileBox );
+        }
 
         JLabel newLabel = new JLabel(Messages.getString("DiffFrame.file_new_label"));
         newFileName = createFileNameField(controller.getNewSourceName());
@@ -174,7 +180,11 @@ public class DiffFrame extends JFrame implements ActionListener, DiffChangeListe
         newCharset.addActionListener(this);
         
         Box newFileBox = createHorizontalBoxedComponents(newLabel, newFileName, newLineSep, newCharset);
-
+        newFileName.setTransferHandler(null);
+        if (isStandAlone ) {
+            oldFileName.setTransferHandler(null);
+            addTransferHandler( SourceType.NEW, newFileBox );
+        }
         filesBox.add(Box.createVerticalStrut(5));
         filesBox.add(oldFileBox);
         filesBox.add(Box.createVerticalStrut(2));
@@ -306,6 +316,41 @@ public class DiffFrame extends JFrame implements ActionListener, DiffChangeListe
         return new Dimension(bounds.width, bounds.height);
     }
 
+    private void addTransferHandler( SourceType type, JComponent comp ) {
+        
+        final SourceType theType = type;
+        comp.setTransferHandler( 
+            new FileDropHandler ( new FileDropListener() {
+                public boolean filesDropped(List<File> files) {
+                    
+                    if ( ! files.get(0).isFile() ) {
+                        JOptionPane.showMessageDialog(
+                            null, 
+                            MessageFormat.format(
+                                Messages.getString("DiffFrame.not_reg_file"),  //$NON-NLS-1$
+                                files.get(0).getPath()
+                            ),
+                            Messages.getString("DiffFrame.title_error"),  //$NON-NLS-1$
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                        return false;
+                    }
+                    try {                        
+                        controller.setSource( theType, new FileInputStreamSource( files.get(0) ) );
+                    } catch (IOException ioe) {
+                        JOptionPane.showMessageDialog(
+                            null, 
+                            ioe.getMessage(), 
+                            Messages.getString("DiffFrame.title_error"),  //$NON-NLS-1$
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                    return true;
+                }
+            })
+        );    
+    }
+    
     private JTextField createFileNameField(String sourceName) {
         JTextField fileNameField = new JTextField();
         fileNameField.setText(sourceName);

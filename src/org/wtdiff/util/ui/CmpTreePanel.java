@@ -33,6 +33,7 @@ import org.wtdiff.util.io.FileUtil;
 import org.wtdiff.util.text.DiffController;
 import org.wtdiff.util.text.InputStreamSource;
 
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ import java.lang.ref.WeakReference;
  * @author davidst
  *
  */
-public class CmpTreePanel extends JPanel implements RootNodeListener, ActionListener, MouseListener, PopupMenuListener {
+public class CmpTreePanel extends JPanel implements RootNodeListener, ActionListener, MouseListener, PopupMenuListener, FileDropListener {
 
     private static final long serialVersionUID = -7918207024051540333L;
     
@@ -143,6 +144,10 @@ public class CmpTreePanel extends JPanel implements RootNodeListener, ActionList
         horizontalBox.add(path);
         this.add(horizontalBox, "North"); //$NON-NLS-1$
         this.add(scrollPane, "Center"); //$NON-NLS-1$
+
+        if (treeType != NodeRole.CMP_ROOT )
+            this.setTransferHandler(new FileDropHandler( this ) );            
+
     }
 
     /**
@@ -181,6 +186,25 @@ public class CmpTreePanel extends JPanel implements RootNodeListener, ActionList
         }
     }
     
+    public boolean filesDropped(List <File> files ) {
+        File firstFile = files.get(0);
+        
+        path.setText(firstFile.getPath());
+        try {
+            doLoad( firstFile );
+        } catch ( IOException ioe ) {
+            JOptionPane.showMessageDialog(
+                null, 
+                ioe.getMessage(), 
+                Messages.getString("CmpTreePanel.title_error"),  //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
+            return false;
+        }            
+
+        return true;
+    }
+    
     /* (non-Javadoc)
      * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
      */
@@ -201,33 +225,7 @@ public class CmpTreePanel extends JPanel implements RootNodeListener, ActionList
                         return;
                     }
                     File pathFile = new File(pathName);
-                    if ( ! pathFile.exists() ) {
-                        JOptionPane.showMessageDialog(
-                            null, 
-                            Messages.getString("CmpTreePanel.message_path_no_exist"),  //$NON-NLS-1$
-                            Messages.getString("CmpTreePanel.title_path_no_exist"),  //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                            );
-                        return;
-                    }
-                    if ( type == NodeRole.OLD_ROOT )
-                        controller.setOldRoot(pathName); //TODO clear tree model to reduce memory use
-                    else
-                        controller.setNewRoot(pathName); //TODO clear tree model to reduce memory use
-                    
-                    ErrorHandler handler = controller.getErrorHandler();
-                    if ( handler.encounteredError() ) {
-                        JOptionPane.showMessageDialog(
-                            null, 
-                            MessageFormat.format(
-                                Messages.getString("CmpTreePanel.message_problem_loading"),  //$NON-NLS-1$
-                                pathName
-                            ),
-                            Messages.getString("CmpTreePanel.title_problem_loading"),  //$NON-NLS-1$
-                            JOptionPane.ERROR_MESSAGE
-                        );
-                        handler.reset();
-                    }
+                    doLoad(pathFile);
                 } else {
                     controller.compare();
                     ErrorHandler handler = controller.getErrorHandler();
@@ -251,22 +249,6 @@ public class CmpTreePanel extends JPanel implements RootNodeListener, ActionList
             }            
         } else if ( object == folderButton ) {
             String pathString  = FileUtil.bestExistingDirFromString(path.getText() , ".");
-//            String pathString = "."; //$NON-NLS-1$
-//            if ( path.getText() != null && path.getText().length() > 0 ) {
-//                String fileOrDir = path.getText();
-//                File pathFile = new File(fileOrDir);
-//                if ( ! pathFile.isDirectory() ) {
-//                    String parent = pathFile.getParent();
-//                    if ( parent != null ) {
-//                        File parentFile = new File(parent);
-//                        if ( parentFile.exists() ) {
-//                            pathString = parent;
-//                        }
-//                    }
-//                } else if ( pathFile.exists() ) { 
-//                    pathString = pathFile.getPath();
-//                }
-//            }
             JFileChooser c = new JFileChooser(new File(pathString));
             c.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
             c.setDialogTitle( 
@@ -316,6 +298,37 @@ public class CmpTreePanel extends JPanel implements RootNodeListener, ActionList
         
     }
 
+    private void doLoad(File loadPath) throws IOException {
+        
+        if ( ! loadPath.exists() ) {
+            JOptionPane.showMessageDialog(
+                null, 
+                Messages.getString("CmpTreePanel.message_path_no_exist"),  //$NON-NLS-1$
+                Messages.getString("CmpTreePanel.title_path_no_exist"),  //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+                );
+            return;
+        }
+        if ( type == NodeRole.OLD_ROOT )
+            controller.setOldRoot(loadPath.getPath()); //TODO clear tree model to reduce memory use
+        else
+            controller.setNewRoot(loadPath.getPath()); //TODO clear tree model to reduce memory use
+        
+        ErrorHandler handler = controller.getErrorHandler();
+        if ( handler.encounteredError() ) {
+            JOptionPane.showMessageDialog(
+                null, 
+                MessageFormat.format(
+                    Messages.getString("CmpTreePanel.message_problem_loading"),  //$NON-NLS-1$
+                    loadPath.getPath()
+                ),
+                Messages.getString("CmpTreePanel.title_problem_loading"),  //$NON-NLS-1$
+                JOptionPane.ERROR_MESSAGE
+            );
+            handler.reset();
+        }
+
+    }
     private void launchDiff(TreePath comparePath) {
         DirNode oldRoot = controller.getOldCompareRootNode();        
         DirNode newRoot = controller.getNewCompareRootNode();        
