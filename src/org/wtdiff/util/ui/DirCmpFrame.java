@@ -29,6 +29,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.wtdiff.util.*;
+import org.wtdiff.util.filter.CompositeNodeFilter;
+import org.wtdiff.util.ui.filter.CompositeFilterDialog;
 
 import javax.swing.*;
 
@@ -45,6 +47,7 @@ public class DirCmpFrame extends JFrame implements ActionListener {
     private JMenuItem exitMenuItem;
     private JCheckBoxMenuItem isTextCompareCheckBox;
     private JCheckBoxMenuItem isIgnoreCaseCompareCheckBox;
+    private JMenuItem filterMenuItem;
     private JMenuItem aboutMenuItem;
     
     /**
@@ -93,6 +96,9 @@ public class DirCmpFrame extends JFrame implements ActionListener {
         optionsMenu.add(isTextCompareCheckBox);
         isIgnoreCaseCompareCheckBox = new JCheckBoxMenuItem(Messages.getString("DirCmpFrame.menu_options_ignore_name_case"), compareController.getIgnoreNameCase()); //$NON-NLS-1$
         optionsMenu.add(isIgnoreCaseCompareCheckBox);
+        filterMenuItem = new JMenuItem(Messages.getString("DirCmpFrame.menu_options_filter"), KeyEvent.VK_F); //$NON-NLS-1$
+        filterMenuItem.addActionListener(this);
+        optionsMenu.add(filterMenuItem);
 
         aboutMenuItem = new JMenuItem(Messages.getString("DirCmpFrame.menu_help_about"), KeyEvent.VK_A);
         helpMenu.add(aboutMenuItem);
@@ -143,6 +149,13 @@ public class DirCmpFrame extends JFrame implements ActionListener {
         }
         else if ( event.getSource() == isIgnoreCaseCompareCheckBox ) {
             compareController.setIgnoreNameCase(isIgnoreCaseCompareCheckBox.isSelected());
+        }   
+        else if ( event.getSource() == filterMenuItem ) {
+            CompositeFilterDialog filterDialog = new CompositeFilterDialog(this, compareController.getFilter());
+            if ( filterDialog.showDialog() == CompositeFilterDialog.DIALOG_RESULT.OK ) {
+                CompositeNodeFilter filter = filterDialog.getFilter();
+                compareController.setFilter(filter);
+            }
         }   
         else if ( event.getSource() == aboutMenuItem ) {
             JOptionPane.showMessageDialog(this, About.aboutText());

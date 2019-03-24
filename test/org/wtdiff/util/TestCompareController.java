@@ -32,6 +32,8 @@ import org.wtdiff.util.LeafComparisonResult;
 import org.wtdiff.util.LoggingErrorHandler;
 import org.wtdiff.util.CompareController;
 import org.wtdiff.util.CompareController.NodeRole;
+import org.wtdiff.util.filter.CompositeNodeFilter;
+import org.wtdiff.util.filter.GlobNameFilter;
 
 import static org.junit.Assert.*;
 
@@ -139,6 +141,42 @@ public class TestCompareController  {
         assertEquals(controller.getCompareRootNode(), controller.getRootNode(NodeRole.CMP_ROOT));
     }
 
+    @Test
+    public void testSetFilter() throws Exception {
+        CompareController controller = new CompareController();
+
+        GlobNameFilter gFilter = new GlobNameFilter("*.bak");
+        CompositeNodeFilter cFilter = new CompositeNodeFilter();
+        cFilter.add(gFilter);
+        
+        assertNull( controller.getFilter() );
+        
+        controller.setFilter(cFilter);
+        
+        assertEquals( cFilter, controller.getFilter() );
+    }
+
+    @Test
+    public void testFilter() throws Exception {
+        CompareController controller = new CompareController();
+        FileSystemTestHelper helper = new FileSystemTestHelper();
+        File testDir1 = helper.createTestDir("testSetRootDir1");
+        helper.createTestFile("t2", "t2-content", testDir1);
+        helper.createTestFile("t1", "t1-content", testDir1);
+
+        GlobNameFilter gFilter = new GlobNameFilter("*2");
+        CompositeNodeFilter cFilter = new CompositeNodeFilter();
+        cFilter.add(gFilter);
+        controller.setFilter(cFilter);
+        
+        controller.setOldRoot(testDir1.getCanonicalPath());
+        
+        DirNode filteredDir = controller.getOldRootNode();
+        assertEquals( "testSetRootDir1", filteredDir.getName() );
+        assertEquals( 1, filteredDir.getLeaves().size() );
+        assertEquals( "t1", filteredDir.getLeaves().get(0).getName() );
+    }
+    
     @Test
     public void testSetRootDir() throws Exception {
         FileSystemTestHelper helper = new FileSystemTestHelper();

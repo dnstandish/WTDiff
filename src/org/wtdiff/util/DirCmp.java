@@ -24,10 +24,14 @@ import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.wtdiff.util.filter.CompositeNodeFilter;
+import org.wtdiff.util.filter.GlobNameFilter;
+import org.wtdiff.util.filter.NodeFilter;
 import org.wtdiff.util.ui.DirCmpFrame;
 /**
  * Main application class.  This application compares one directory structure
@@ -68,6 +72,7 @@ public class DirCmp {
     static Option ignorePermErrorOption;
     static Option textCompareOption;
     static Option guiOption;
+    static Option excludeOption;
     static {
         aboutOption = new Option("a", "about", false, Messages.getString("DirCmp.opt.about.msg")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         helpOption = new Option("h", "help", false, Messages.getString("DirCmp.opt.help.msg")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -75,6 +80,7 @@ public class DirCmp {
         ignorePermErrorOption = new Option("p", "ignorepermerror", false, Messages.getString("DirCmp.opt.ignore_perm_error.msg")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         textCompareOption = new Option("t", "textcompare", false, Messages.getString("DirCmp.opt.textcompare.msg"));         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         guiOption = new Option("g", "gui", false, Messages.getString("DirCmp.opt.gui.msg"));         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        excludeOption = new Option("x", "exclude", true, Messages.getString("DirCmp.opt.exclude.msg"));         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
     public static Options buildOptions() {
     	Options opts = new Options();
@@ -84,6 +90,7 @@ public class DirCmp {
         opts.addOption(ignorePermErrorOption);
         opts.addOption(textCompareOption);
         opts.addOption(guiOption);
+        opts.addOption(excludeOption);
         return opts;
     }
     
@@ -136,6 +143,7 @@ public class DirCmp {
         boolean isIgnorePermErrors = false;
         boolean isTextCompare = false;
         boolean isGui = false;
+        Vector<String> excludes = new Vector<String>();
         try {
             cl = parser.parse(opts,args);
         } catch (ParseException pe) {
@@ -166,6 +174,9 @@ public class DirCmp {
             else if ( o.equals(guiOption) ) {
                 isGui = true;
             }
+            else if ( o.equals(excludeOption) ) {
+                excludes.addAll(o.getValuesList());
+            }
             else {
                 throw new Exception(
                     MessageFormat.format(Messages.getString("DirCmp.opt.bug"), o)
@@ -190,6 +201,14 @@ public class DirCmp {
         
         controller.setTextCompare(isTextCompare);
         controller.setIgnoreNameCase(isIgnoreCase);
+        
+        if ( excludes.size() > 0 ) {
+            CompositeNodeFilter filter = new CompositeNodeFilter();
+            for ( String glob: excludes ) {
+                filter.add( new GlobNameFilter( glob ) );
+            }
+            controller.setFilter(filter);
+        }
         Result result = Result.FAILED;
         try {
             if ( what.size() > 0 ) {

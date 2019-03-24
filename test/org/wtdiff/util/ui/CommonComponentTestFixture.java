@@ -21,6 +21,7 @@ import java.awt.Container;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -137,6 +138,16 @@ public class CommonComponentTestFixture   extends ComponentTestFixture {
         }
     }
 
+    protected class JCheckBoxMatcher implements Matcher {
+        
+        public JCheckBoxMatcher() {
+        }
+        
+        public boolean matches(Component c) {
+            return c instanceof JCheckBox;
+        }
+    }
+
     protected class JCheckBoxMenuItemMatcher implements Matcher {
         
         private String text;
@@ -152,6 +163,7 @@ public class CommonComponentTestFixture   extends ComponentTestFixture {
 
     protected JLabelAndTextMatcher labelMatcher = new JLabelAndTextMatcher();
     protected JTextFieldMatcher textFieldMatcher = new JTextFieldMatcher();
+    protected JCheckBoxMatcher jCheckBoxMatcher = new JCheckBoxMatcher();
     protected OKJButtonMatcher okButtonMatcher = new OKJButtonMatcher();
     protected CancelJButtonMatcher cancelButtonMatcher = new CancelJButtonMatcher();
     protected CloseJButtonMatcher closeButtonMatcher = new CloseJButtonMatcher();

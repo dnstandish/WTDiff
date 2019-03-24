@@ -4,7 +4,7 @@
  * All rights reserved
  -->
 <project name="WTDiff" default="all" basedir=".">
-    <property name ="version" value="0.0.2"/> 
+    <property name ="version" value="0.0.3"/> 
     <property name ="final.name" value="${ant.project.name}-${version}"/> 
     <property name="src.dir" value="src"/>
     <property name="scripts.dir" value="${src.dir}/scripts"/>
@@ -115,7 +115,7 @@
         </cobertura-instrument> -->
         <javac destdir="${build.test.classes}" debug="${debug.flag}" includeantruntime="false">
             <src path="${test.src.dir}"/>
-            <exclude name="**/ui/*"/>
+            <exclude name="**/ui/**"/>
             <classpath>
                 <path refid="classpath"/>
                 <pathelement path="${build.classes}"/>
@@ -132,7 +132,7 @@
     <target name="compile-test-gui" depends="compile-test" if="abbot.dir" >
         <javac destdir="${build.test.classes}" debug="${debug.flag}" includeantruntime="false">
             <src path="${test.src.dir}"/>
-            <include name="**/ui/*"/>
+            <include name="**/ui/**"/>
             <classpath>
                 <path refid="classpath"/>
                 <path refid="junit.classpath"/>
@@ -213,8 +213,8 @@
             <batchtest todir="${test.out.dir}" unless="testcase">
                 <fileset dir="${build.test.classes}">
                     <include name="**/Test*.class"/>
-                    <exclude name="**/ui/*.class"/>
-                    <exclude name="**/Test*$*.class"/>
+                    <exclude name="**/ui/**/*.class"/>
+                    <exclude name="**/**/Test*$*.class"/>
                 </fileset>
             </batchtest>
         </junit>
@@ -239,8 +239,8 @@
             <test todir="${test.out.dir}"  name="${testcase}" if="testcase"/> 
             <batchtest  todir="${test.out.dir}" unless="testcase">
                 <fileset dir="${build.test.classes}">
-                    <include name="**/ui/Test*.class"/>
-                    <exclude name="**/ui/Test*$*.class"/>
+                    <include name="**/ui/**/Test*.class"/>
+                    <exclude name="**/ui/**/Test*$*.class"/>
                 </fileset>
             </batchtest>
         </junit>

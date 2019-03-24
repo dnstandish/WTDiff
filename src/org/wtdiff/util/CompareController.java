@@ -25,6 +25,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.*;
 
+import org.wtdiff.util.filter.CompositeNodeFilter;
+import org.wtdiff.util.filter.NodeFilter;
 import org.wtdiff.util.xml.XMLTreeBuilder;
 
 /**
@@ -79,6 +81,11 @@ public class CompareController { //TODO change class name
      */
     private boolean isIgnoreNameCase = false;
     
+    /**
+     * Filter to be applied when constructing trees
+     * {@link fitler.NodeFilter#NodeFilter()}
+     */
+    private CompositeNodeFilter filter;
     /**
      * Listeners to be notified when the "Old" root node has been built into a tree 
      */
@@ -170,6 +177,20 @@ public class CompareController { //TODO change class name
         return isIgnoreNameCase;
     }
     
+    
+    /**
+     * TODO javadoc
+     */
+    public void setFilter( CompositeNodeFilter f ) {
+        filter = f;
+    }
+    /**
+     * TODO javadoc
+     */
+    public CompositeNodeFilter getFilter( ) {
+        return filter;
+    }
+
     /**
      * String representing root of old tree
      * 
@@ -419,7 +440,14 @@ public class CompareController { //TODO change class name
                 builder = new FileSystemNodeTreeBuilder(root);
             }
         }
-        return builder.buildTree(errorHandler);
+        
+        DirNode rootNode = builder.buildTree(errorHandler);
+        if ( filter != null ) {
+            FilterTreeBuilder filterBuilder = new FilterTreeBuilder( rootNode, filter);
+            rootNode = filterBuilder.buildTree(errorHandler);
+        }
+
+        return rootNode;
     }
     
     /**
