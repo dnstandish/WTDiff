@@ -7,9 +7,9 @@
 <digest-name name="SHA-256"/>
 </digests-available>
 <!-- meta info re file tree captured -->
-<user>davidst</user>
-<home>/home/davidst/tmp></home>
-<current-dir>/home/davidst/prog/java/adhoc</current-dir>
+<user>myself</user>
+<home>/home/myself/tmp></home>
+<current-dir>/home/myself/prog/java/adhoc</current-dir>
 <os>Linux</os>
 <host>weeble</host>
 <snapshot>

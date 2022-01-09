@@ -6,9 +6,9 @@ diffutils-1.2.1
 Apache Commons Command line (commons-cli-1.2-src)
     lib/commons-cli-1.2.jar
 
-Apache Log4J 2.0.2 (apache-log4j-2.0.2-bin)
-    lib/log4j-api-2.0.2.jar
-    lib/log4j-core-2.0.2.jar
+Apache Log4J 2.12.4 (apache-log4j-2.12.4-bin)
+    lib/log4j-api-2.12.4.jar
+    lib/log4j-core-2.12.4.jar
 
 
 Testing

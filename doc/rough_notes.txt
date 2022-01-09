@@ -31,57 +31,57 @@ apache commons-io (this seems to fail in one edge case below)
         }
 
 
-> ~/tmp/a$ ls -lR /home/davidst/tmp/a
-/home/davidst/tmp/a:
+> ~/tmp/a$ ls -lR /home/myself/tmp/a
+/home/myself/tmp/a:
 total 4
-lrwxrwxrwx 1 davidst davidst    4 Jul 10 13:35 b -> ../a
-lrwxrwxrwx 1 davidst davidst    1 Jul 10 18:49 c -> d
-lrwxrwxrwx 1 davidst davidst    1 Jul 10 18:48 e -> e
-drwxrwxr-x 2 davidst davidst 4096 Jul 10 18:52 f
-prw-rw-r-- 1 davidst davidst    0 Jul 10 18:46 FIFO
-lrwxrwxrwx 1 davidst davidst    1 Jul 10 18:52 g -> f
--rw-rw-r-- 1 davidst davidst    0 Jul 10 19:45 h
-lrwxrwxrwx 1 davidst davidst    1 Jul 10 19:45 i -> h
+lrwxrwxrwx 1 myself myself    4 Jul 10 13:35 b -> ../a
+lrwxrwxrwx 1 myself myself    1 Jul 10 18:49 c -> d
+lrwxrwxrwx 1 myself myself    1 Jul 10 18:48 e -> e
+drwxrwxr-x 2 myself myself 4096 Jul 10 18:52 f
+prw-rw-r-- 1 myself myself    0 Jul 10 18:46 FIFO
+lrwxrwxrwx 1 myself myself    1 Jul 10 18:52 g -> f
+-rw-rw-r-- 1 myself myself    0 Jul 10 19:45 h
+lrwxrwxrwx 1 myself myself    1 Jul 10 19:45 i -> h
 
-/home/davidst/tmp/a/f:
+/home/myself/tmp/a/f:
 total 0
 
 Program output
 
-home/davidst/tmp/a/b exists true is file false is dir true
-canon.getCanonicalFile(): /home/davidst/tmp/a
-canon.getAbsoluteFile(): /home/davidst/tmp/a/b
-/home/davidst/tmp/a/b is symlink true is reg file false
+home/myself/tmp/a/b exists true is file false is dir true
+canon.getCanonicalFile(): /home/myself/tmp/a
+canon.getAbsoluteFile(): /home/myself/tmp/a/b
+/home/myself/tmp/a/b is symlink true is reg file false
 
-/home/davidst/tmp/a/c exists false is file false is dir false
-canon.getCanonicalFile(): /home/davidst/tmp/a/c
-canon.getAbsoluteFile(): /home/davidst/tmp/a/c
-/home/davidst/tmp/a/c is symlink true is reg file false
+/home/myself/tmp/a/c exists false is file false is dir false
+canon.getCanonicalFile(): /home/myself/tmp/a/c
+canon.getAbsoluteFile(): /home/myself/tmp/a/c
+/home/myself/tmp/a/c is symlink true is reg file false
 
-/home/davidst/tmp/a/e exists false is file false is dir false
-canon.getCanonicalFile(): /home/davidst/tmp/a/e
-canon.getAbsoluteFile(): /home/davidst/tmp/a/e
-/home/davidst/tmp/a/e is symlink true is reg file false
+/home/myself/tmp/a/e exists false is file false is dir false
+canon.getCanonicalFile(): /home/myself/tmp/a/e
+canon.getAbsoluteFile(): /home/myself/tmp/a/e
+/home/myself/tmp/a/e is symlink true is reg file false
 
-/home/davidst/tmp/a/g exists true is file false is dir true
-canon.getCanonicalFile(): /home/davidst/tmp/a/f
-canon.getAbsoluteFile(): /home/davidst/tmp/a/g
-/home/davidst/tmp/a/g is symlink true is reg file false
+/home/myself/tmp/a/g exists true is file false is dir true
+canon.getCanonicalFile(): /home/myself/tmp/a/f
+canon.getAbsoluteFile(): /home/myself/tmp/a/g
+/home/myself/tmp/a/g is symlink true is reg file false
 
-/home/davidst/tmp/a/i exists true is file true is dir false
-canon.getCanonicalFile(): /home/davidst/tmp/a/h
-canon.getAbsoluteFile(): /home/davidst/tmp/a/i
-/home/davidst/tmp/a/i is symlink true is reg file true
+/home/myself/tmp/a/i exists true is file true is dir false
+canon.getCanonicalFile(): /home/myself/tmp/a/h
+canon.getAbsoluteFile(): /home/myself/tmp/a/i
+/home/myself/tmp/a/i is symlink true is reg file true
 
 /dev/tty exists true is file false is dir false
 canon.getCanonicalFile(): /dev/tty
 canon.getAbsoluteFile(): /dev/tty
 /dev/tty is symlink false is reg file false
 
-/home/davidst/tmp/a/FIFO exists true is file false is dir false
-canon.getCanonicalFile(): /home/davidst/tmp/a/FIFO
-canon.getAbsoluteFile(): /home/davidst/tmp/a/FIFO
-/home/davidst/tmp/a/FIFO is symlink false is reg file false
+/home/myself/tmp/a/FIFO exists true is file false is dir false
+canon.getCanonicalFile(): /home/myself/tmp/a/FIFO
+canon.getAbsoluteFile(): /home/myself/tmp/a/FIFO
+/home/myself/tmp/a/FIFO is symlink false is reg file false
 
 
 
@@ -93,7 +93,7 @@ Java.util.zip doesn't appear to give access to the information that identifies a
 I suspect it is in the OS specific data for the entry.
 It does not appear to be in the "extra" field.
 
-davidst@weeble:~/tmp/test$ unzip -l 123.zip
+myself@weeble:~/tmp/test$ unzip -l 123.zip
 Archive:  123.zip
   Length      Date    Time    Name
 ---------  ---------- -----   ----
@@ -121,7 +121,7 @@ NIO does throw exception when trying to list files for a directory w/o read perm
 
 NIO does NOT throw exception for files in a directory w/o execute permission
 interestingly both exists and not exists return false
-/home/davidst/tmp/a/noexec/123
+/home/myself/tmp/a/noexec/123
 directory(nofollow) false
 directory false
 reg(nofollow) false
@@ -141,7 +141,7 @@ performance
  ~16GB
  ~76k files
 
-davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+myself@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
 Sat Aug 23 18:36:17 EDT 2014
 Sat Aug 23 18:49:27 EDT 2014
 
@@ -151,9 +151,9 @@ sys     0m47.476s
 
 Note exception if a file disappears (in this case I had eclipse open at the start but closed it shortly after)
 
-davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+myself@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
 Sat Aug 23 19:00:16 EDT 2014
-Exception in thread "main" java.io.FileNotFoundException: /home/davidst/.eclipse/org.eclipse.platform_3.8_155965261/configuration/org.eclipse.core.runtime/.manager/.tmp4959908947136546827.instance (No such file or directory)
+Exception in thread "main" java.io.FileNotFoundException: /home/myself/.eclipse/org.eclipse.platform_3.8_155965261/configuration/org.eclipse.core.runtime/.manager/.tmp4959908947136546827.instance (No such file or directory)
         at java.io.FileInputStream.open(Native Method)
         at java.io.FileInputStream.<init>(FileInputStream.java:146)
         at org.standev.util.FileSystemFileNode.getInputStream(FileSystemFileNode.java:161)
@@ -179,7 +179,7 @@ Sat Aug 23 19:08:11 EDT 2014
 real    7m55.350s
 user    1m5.008s
 sys     0m36.004s
-davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+myself@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
 Sat Aug 23 19:08:41 EDT 2014
 Sat Aug 23 19:21:39 EDT 2014
 
@@ -191,7 +191,7 @@ sys     0m47.840s
 Change inputstream to boffered input stream to see is that affects performance (note still reading in 512 chunks)
 - no real difference
 
-davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+myself@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
 Sat Aug 23 19:34:54 EDT 2014
 Sat Aug 23 19:48:04 EDT 2014
 
@@ -201,7 +201,7 @@ sys     0m47.748s
 
 Change buffer to 4096
 - no improvement
-davidst@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
+myself@weeble:~/prog/java/ZipCmp$ time ( date ; java -jar dist/lib/ZipCmp.jar  -d ~ -d ~ > /dev/null ; date )
 Sat Aug 23 19:54:01 EDT 2014
 Sat Aug 23 20:07:11 EDT 2014
 
@@ -212,7 +212,7 @@ sys     0m51.088s
 
 Compare read IO to cat.
 - hmm, if cat is any indication performance is not bad 
-davidst@weeble:~$ date ; find . -type f -print0 | xargs -0 cat > /dev/null ; date
+myself@weeble:~$ date ; find . -type f -print0 | xargs -0 cat > /dev/null ; date
 Sat Aug 23 20:30:49 EDT 2014
 [5]+  Done                    eclipse
 Sat Aug 23 20:40:20 EDT 2014
@@ -223,10 +223,10 @@ Change FileNode.compareConyent() back to original
 =================================
 2014/08/29
 =================================
-davidst@weeble:~/prog/java/ZipCmp$ java -Duser.country=CA -Duser.language=fr -jar dist/lib/ZipCmp.jar -d ~/tmp/a/b -d ~/tmp/a -p -t
+myself@weeble:~/prog/java/ZipCmp$ java -Duser.country=CA -Duser.language=fr -jar dist/lib/ZipCmp.jar -d ~/tmp/a/b -d ~/tmp/a -p -t
 - gives French version of localized messages, but built-in exception messages still English
 
-davidst@weeble:~/prog/java/ZipCmp$ LANGUAGE=fr java -Duser.country=CA -Duser.language=fr -jar dist/lib/ZipCmp.jar -d ~/tmp/a/b -d ~/tmp/a -p -t
+myself@weeble:~/prog/java/ZipCmp$ LANGUAGE=fr java -Duser.country=CA -Duser.language=fr -jar dist/lib/ZipCmp.jar -d ~/tmp/a/b -d ~/tmp/a -p -t
 - gives French version of localized messages and built-in exception messages
 
 
@@ -370,7 +370,7 @@ FAIL 3
 
 FAIL 1
 BUILD FAILED
-/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestDiffOpenDialog failed
+/home/myself/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestDiffOpenDialog failed
 
   <testcase classname="org.standev.util.ui.TestDiffOpenDialog" name="testFolderButton" time="0.711">
     <error message="No Component found with matcher &apos;org.standev.util.ui.CommonComponentTestFixture$JLabelAndTextMatcher@10c93d7&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.CommonComponentTestFixture$JLabelAndTextMatcher@10c93d7&apos;
@@ -396,7 +396,7 @@ BUILD FAILED
 </error>
 
 FAIL 3
-/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpFrame failed
+/home/myself/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpFrame failed
  <testcase classname="org.standev.util.ui.TestZipCmpFrame" name="testIgnoreNameCaseMenuItem" time="1.668">
     <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
         at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
@@ -420,7 +420,7 @@ FAIL 3
 </error>
 
 FAIL 1
-/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpTreePanel failed
+/home/myself/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpTreePanel failed
   <testcase classname="org.standev.util.ui.TestZipCmpTreePanel" name="testPanelFolder" time="1.133">
     <error message="No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$20@a2a147&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$20@a2a147&apos;
         at abbot.finder.BasicFinder.find(BasicFinder.java:87)
@@ -444,7 +444,7 @@ FAIL 1
         at org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner.main(JUnitTestRunner.java:1016)
 </error>
 
-home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpTreePanel failed
+home/myself/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpTreePanel failed
 FAIL 2  <testcase classname="org.standev.util.ui.TestZipCmpTreePanel" name="testPanelFolder" time="0.631">
     <error message="No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$18@1e8e2db&apos;" type="abbot.finder.ComponentNotFoundException">abbot.finder.ComponentNotFoundException: No Component found with matcher &apos;org.standev.util.ui.TestZipCmpTreePanel$18@1e8e2db&apos;
         at abbot.finder.BasicFinder.find(BasicFinder.java:87)
@@ -483,7 +483,7 @@ Modify org.standev.util.ui.TestZipCmpTreePanel testPanelFolder code in several p
 ~/prog/java/ZipCmp$ for i in 1 2 3 4 5 6 7 8 9 0 ; do  ant coverage-gui ; if [ $? -ne 0 ] ; then echo FAIL $i >> delme.out; break ; else echo success >> delme.out  ; fi; echo $i ; done
 FAIL 0
 - failed on 10th try
-/home/davidst/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpFrame failed
+/home/myself/prog/java/ZipCmp/build.xml:138: Test org.standev.util.ui.TestZipCmpFrame failed
   <testcase classname="org.standev.util.ui.TestZipCmpFrame" name="testTextCompareMenuItem" time="1.662">
     <error type="java.util.ConcurrentModificationException">java.util.ConcurrentModificationException
         at java.util.WeakHashMap$HashIterator.nextEntry(WeakHashMap.java:882)
@@ -1020,7 +1020,7 @@ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_z
 2015/04/22
 ============
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 84c84
 < <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 ---
@@ -1030,7 +1030,7 @@ davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCo
 ---
 > <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:23 AM.</div>
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 84c84
 < <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 ---
@@ -1040,7 +1040,7 @@ davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCo
 ---
 > <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:25 AM.</div>
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 84c84
 < <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 ---
@@ -1050,7 +1050,7 @@ davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCo
 ---
 > <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:29 AM.</div>
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 84c84
 < <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 ---
@@ -1061,8 +1061,8 @@ davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCo
 > <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:33 AM.</div>
 
 ------------------------------------------
-davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ rm cobertura.ser 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java/delme_zipcmp/ZipCmp$ rm cobertura.ser 
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 84c84
 < <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 ---
@@ -1072,7 +1072,7 @@ davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCo
 ---
 > <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:35 AM.</div>
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 84c84
 < <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 ---
@@ -1084,39 +1084,39 @@ davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCo
 
 
 --------------------------------------
-davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant -Dtestcase=org.standev.util.TestZipCompareController coverage-base
+myself@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant -Dtestcase=org.standev.util.TestZipCompareController coverage-base
 
 
-davidst@weeble:~/prog/java$ grep enum delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ grep enum delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 
 
-davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant -Dtestcase=org.standev.util.TestZipCompareController coverage-base
+myself@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant -Dtestcase=org.standev.util.TestZipCompareController coverage-base
 
-davidst@weeble:~/prog/java$ grep enum delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ grep enum delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 
 ------------------------------------------
 try setting forkmode=once for test-base junit task
 (Note back to running official project)
-davidst@weeble:~/prog/java/ZipCmp$ ant coverage-base
+myself@weeble:~/prog/java/ZipCmp$ ant coverage-base
 
-davidst@weeble:~/prog/java$ grep enum ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ grep enum ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 <tr>  <td class="numLineCover">&nbsp;32</td>  <td class="nbHitsCovered">&nbsp;8</td>  <td class="src"><pre class="src">&nbsp;    <span class="keyword">public</span> enum NodeRole { OLD_ROOT, NEW_ROOT, CMP_ROOT }</pre></td></tr>
 
 (refresh copy of project)
-davidst@weeble:~/prog/java$ cp -a ZipCmp delme_zipcmp
+myself@weeble:~/prog/java$ cp -a ZipCmp delme_zipcmp
 
-davidst@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant coverage-base
+myself@weeble:~/prog/java/delme_zipcmp/ZipCmp$ ant coverage-base
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage/org.standev.util.ZipCompareController.html delme_zipcmp/ZipCmp/build/coverage/org.standev.util.ZipCompareController.html
 1014c1014
 < <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:53 AM.</div>
 ---
 > <div class="footer">Report generated by <a href="http://cobertura.sourceforge.net/" target="_top">Cobertura</a> 2.1.1 on 22/04/15 11:56 AM.</div>
 
 
-davidst@weeble:~/prog/java$ diff -r ZipCmp/build/coverage delme_zipcmp/ZipCmp/build/coverage | grep -v 'Report generated by'
+myself@weeble:~/prog/java$ diff -r ZipCmp/build/coverage delme_zipcmp/ZipCmp/build/coverage | grep -v 'Report generated by'
 - no differences in counts
 
 -------------------------------------------------
@@ -1169,7 +1169,7 @@ I am sufficiently confident that these minor differences are OK to proceed with 
 
 First step is to run conversion on copy of project
 
-davidst@weeble:~/prog/perl/java_jumit3_to_junit4$ ./java_junit3_to_junit4.perl  ../../java/delme_zipcmp/ZipCmp/test | tee conversion.log
+myself@weeble:~/prog/perl/java_jumit3_to_junit4$ ./java_junit3_to_junit4.perl  ../../java/delme_zipcmp/ZipCmp/test | tee conversion.log
 
 ant coverage is successful
 
@@ -1181,9 +1181,9 @@ differences in actual line counts for individual lines are similar to when both 
 
 run conversion on official project
 
-davidst@weeble:~/prog/perl/java_jumit3_to_junit4$ ./java_junit3_to_junit4.perl  ../../java/ZipCmp/test | tee conversion_official.log
+myself@weeble:~/prog/perl/java_jumit3_to_junit4$ ./java_junit3_to_junit4.perl  ../../java/ZipCmp/test | tee conversion_official.log
 
-davidst@weeble:~/prog/java/ZipCmp$ find test/ -name '*.bak' -exec rm {} \;
+myself@weeble:~/prog/java/ZipCmp$ find test/ -name '*.bak' -exec rm {} \;
 
 ant clean
 ant coverage
@@ -1219,7 +1219,7 @@ no failures out of 50
 
 ant coverage
 BUILD FAILED
-/home/davidst/prog/java/ZipCmp/build.xml:224: Test org.standev.util.ui.TestDiffFrame failed
+/home/myself/prog/java/ZipCmp/build.xml:224: Test org.standev.util.ui.TestDiffFrame failed
   <testcase classname="org.standev.util.ui.TestDiffFrame" name="testMenuNotStandalone" time="30.67">
     <error message="Can&apos;t obtain position of component &apos;Close&apos; (JMenuItem)" type="abbot.tester.ComponentNotShowingException">abbot.tester.ComponentNotShowingException: Can&apos;t obtain position of component &apos;Close&apos; (JMenuItem)
         at abbot.tester.Robot.mouseMove(Robot.java:840)

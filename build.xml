@@ -4,7 +4,7 @@
  * All rights reserved
  -->
 <project name="WTDiff" default="all" basedir=".">
-    <property name ="version" value="0.0.3"/> 
+    <property name ="version" value="0.0.4"/> 
     <property name ="final.name" value="${ant.project.name}-${version}"/> 
     <property name="src.dir" value="src"/>
     <property name="scripts.dir" value="${src.dir}/scripts"/>
